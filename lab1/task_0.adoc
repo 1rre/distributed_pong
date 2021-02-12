@@ -1,0 +1,6 @@
+= Task 0
+
+I successfully installed Quartus on my laptop & ran the programmer. +
+To allow the USB blaster to use the USB ports, I had to update my system config as described https://community.intel.com/t5/Intel-Quartus-Prime-Software/Linux-Unexpected-error-code-89/td-p/23038[here]. +
+After updating this, the board was updated and the 1st 4 dip-switches worked correctly as a hexadecimal counter for the 1st 7-segment display. +
+Interestingly the behaviour was transient - when I unplugged the board and plugged it back in the program did not run again.
