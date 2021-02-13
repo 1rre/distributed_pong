@@ -17,8 +17,3 @@ loop(Socket) ->
   end,
   loop(Socket).
 
-old_loop(Socket) ->
-  Recieved = gen_tcp:recv(Socket, 0),
-  io:fwrite("Recieved:~n~p~n", [Recieved]),
-  loop(Socket).
-
