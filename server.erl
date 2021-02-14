@@ -1,3 +1,6 @@
+-module(server).
+-export([main/1]).
+
 -define(PORT, 4000).
  
 main(_Args) ->

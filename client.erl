@@ -1,3 +1,6 @@
+-module(client).
+-export([main/1]).
+
 -define(IP_ADDRESS, {35,234,158,230}).
 -define(PORT, 4000).
  

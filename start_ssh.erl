@@ -42,5 +42,6 @@ do_git_clone(Port, Channel) ->
   run_server(Port, Channel).
 
 run_server(Port, Channel) -> 
+  io:fwrite("Running Server\n"),
   ssh_connection:exec(Port, Channel, "screen escript server.erl", infinity).
 
