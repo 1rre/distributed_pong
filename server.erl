@@ -4,7 +4,7 @@
 -define(PORT, 4000).
  
 main(_Args) ->
-  {ok, Listen} = gen_tcp:listen(?PORT, [{keepalive, true}]),
+  {ok, Listen} = gen_tcp:listen(?PORT, [{active, true}, {keepalive, true}]),
   {ok, Socket} = gen_tcp:accept(Listen),
   loop(Socket).
  

@@ -5,7 +5,7 @@
 -define(PORT, 4000).
  
 main(_Args) ->
-  {ok, Socket} = gen_tcp:connect(?IP_ADDRESS, ?PORT, []),
+  {ok, Socket} = gen_tcp:connect(?IP_ADDRESS, ?PORT, [{active, true}, {keepalive, true}]),
   loop(Socket).
  
 loop(Socket) ->

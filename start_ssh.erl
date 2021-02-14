@@ -10,11 +10,11 @@ main(_Args) ->
   {ok, Channel} = ssh_connection:session_channel(Port, 5000),
   %success = ssh_connection:exec(Port, Channel, "bash", infinity),
   ok = ssh_connection:shell(Port, Channel),
+  ssh_connection:send(Port, Channel, "escript 2> /dev/null\necho $?\n"),
   check_erl_inst(Port, Channel),
   ok.
 
 check_erl_inst(Port, Channel) ->
-  ssh_connection:send(Port, Channel, "escript 2> /dev/null\necho $?\n"),
   receive
     {ssh_cm, _Pid, {data,0,0,<<"127\n">>}} -> 
       io:fwrite("Installing Erlang~n"),
@@ -22,6 +22,8 @@ check_erl_inst(Port, Channel) ->
       ssh_connection:send(Port, Channel, "sudo apt-get -y install erlang erlang-dev 2>/dev/null\n"),
       check_server_inst(Port, Channel);
     {ssh_cm, _Pid, {data,0,0,<<"1\n">>}} -> 
+      io:fwrite("Erlang installed~n"),
+      ssh_connection:send(Port, Channel, "cd Info_Proc_Labs 2> /dev/null; echo $?\n"),
       check_server_inst(Port, Channel);
     Msg -> 
       io:fwrite("Got: ~n~p~n", [Msg]),
@@ -30,10 +32,13 @@ check_erl_inst(Port, Channel) ->
 
 check_server_inst(Port, Channel) ->
   io:fwrite("Checking server inst~n"),
-  ssh_connection:send(Port, Channel, "cd Info_Proc_Labs 2> /dev/null && echo $?\n"),
   receive
-    {ssh_cm, _Pid, {data,0,0,<<"0\n">>}} -> run_server(Port, Channel);  
-    {ssh_cm, _Pid, {data,0,0,<<"1\n">>}} -> do_git_clone(Port, Channel);  
+    {ssh_cm, _Pid, {data,0,0,<<"0\n">>}} -> 
+      io:fwrite("Dir exits~n"),
+      run_server(Port, Channel);  
+    {ssh_cm, _Pid, {data,0,0,<<"1\n">>}} -> 
+      io:fwrite("Cloning~n"),
+      do_git_clone(Port, Channel);  
     _Msg -> check_server_inst(Port, Channel)
   end.
 
@@ -43,5 +48,13 @@ do_git_clone(Port, Channel) ->
 
 run_server(Port, Channel) -> 
   io:fwrite("Running Server\n"),
-  ssh_connection:exec(Port, Channel, "screen escript server.erl", infinity).
+  ssh_connection:exec(Port, Channel, "screen escript server.erl", infinity),
+  loop().
+
+
+loop() ->
+  receive 
+    Msg -> io:fwrite("Got ~n~p~n", [Msg])
+  end,
+  loop().
 
