@@ -15,7 +15,7 @@ start_loop() ->
 loop(Socket) ->
   receive
     {send,Msg} -> gen_server:cast(Socket, {send, Msg, ?IP, ?PORT_B});
-    {udp,_Port,_Ip,?PORT_A,Msg} -> gen_server:cast(Socket, {recv, Msg});
+    {udp,_Sock,_Ip,_Port,Msg} -> gen_server:cast(Socket, {recv, Msg});
     Msg -> io:fwrite("Received ~p~n", [Msg])
   end,
   loop(Socket).

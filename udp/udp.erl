@@ -18,6 +18,9 @@ handle_cast({recv, Msg}, Socket) ->
 handle_cast({send, Msg, Ip, Dest}, Socket) ->
   io:fwrite("Sending: ~p to ~p~n", [Msg, {Ip, Dest}]),
   gen_udp:send(Socket, Ip, Dest, Msg),
+  {noreply, Socket};
+handle_cast(Msg, Socket) ->
+  io:fwrite("received: ~p~n", [Msg]),
   {noreply, Socket}.
 
 handle_call(_,_,State) -> {reply, ok, State}.
