@@ -11,14 +11,14 @@ init([Parent, Port]) ->
   {ok, Socket}.
 
 
-handle_call({recv, Msg}, From, Socket) ->
-  io:fwrite("got: ~p from ~p~n", [Msg, From]),
-  {reply, ok, Socket};
+handle_cast({recv, Msg}, Socket) ->
+  io:fwrite("received: ~p~n", [Msg]),
+  {noreply, Socket};
 
-handle_call({send, Msg, Ip, Dest}, _From, Socket) ->
+handle_cast({send, Msg, Ip, Dest}, Socket) ->
   io:fwrite("Sending: ~p to ~p~n", [Msg, {Ip, Dest}]),
   gen_udp:send(Socket, Ip, Dest, Msg),
-  {reply, ok, Socket}.
+  {noreply, Socket}.
 
-handle_cast(_,State) -> {noreply, State}.
+handle_call(_,_,State) -> {reply, ok, State}.
 
