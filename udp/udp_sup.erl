@@ -9,18 +9,15 @@ start(_Type, _Args) ->
 
 start_loop() ->
   erlang:register(udp_sup, self()),
-  {ok, A} = udp:start_link(self(), ?PORT_A),
-  {ok, B} = udp:start_link(self(), ?PORT_B),
-  loop(A,B).
+  {ok, Socket} = udp:start_link(self(), ?PORT_A),
+  loop(Socket).
 
-loop(A,B) ->
+loop(Socket) ->
   receive
-    {send,a,Msg} -> gen_server:cast(A, {send, Msg, ?IP, ?PORT_B});
-    {send,b,Msg} -> gen_server:cast(B, {send, Msg, ?IP, ?PORT_A});
-    {udp,_Port,_Ip,?PORT_A,Msg} -> gen_server:cast(A, {recv, Msg});
-    {udp,_Port,_Ip,?PORT_B,Msg} -> gen_server:cast(B, {recv, Msg});
+    {send,Msg} -> gen_server:cast(Socket, {send, Msg, ?IP, ?PORT_B});
+    {udp,_Port,_Ip,?PORT_A,Msg} -> gen_server:cast(Socket, {recv, Msg});
     Msg -> io:fwrite("Received ~p~n", [Msg])
   end,
-  loop(A,B).
+  loop(Socket).
 
 stop(_Type) -> ok.

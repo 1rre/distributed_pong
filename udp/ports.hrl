@@ -1,3 +1,3 @@
 -define(PORT_A, 4543).
--define(PORT_B, 6575).
--define(IP, localhost).
+-define(PORT_B, 4543).
+-define(IP, {195,213,86,206}).
