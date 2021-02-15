@@ -1,7 +1,7 @@
 -module(client).
 -export([main/1]).
 
--define(IP_ADDRESS, {35,234,158,230}).
+-define(IP_ADDRESS, {34,105,136,143}).
 -define(PORT, 4000).
  
 main(_Args) ->
