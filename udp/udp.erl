@@ -11,17 +11,24 @@ init([Parent, Port]) ->
   {ok, Socket}.
 
 
+handle_cast({recv, ":q!"}, Socket) ->
+  ok = gen_udp:close(Socket),
+  exit(ok);
 handle_cast({recv, Msg}, Socket) ->
   io:fwrite("received: ~p~n", [Msg]),
   {noreply, Socket};
-
+handle_cast({send, ":q!", Ip, Dest}, Socket) ->
+  io:fwrite("Sending: :q! to ~p~n", [{Ip, Dest}]),
+  ok = gen_udp:send(Socket, Ip, Dest, ":q!"),
+  ok = gen_udp:close(Socket),
+  exit(ok);
 handle_cast({send, Msg, Ip, Dest}, Socket) ->
   io:fwrite("Sending: ~p to ~p~n", [Msg, {Ip, Dest}]),
-  gen_udp:send(Socket, Ip, Dest, Msg),
+  ok = gen_udp:send(Socket, Ip, Dest, Msg),
   {noreply, Socket};
 handle_cast(Msg, Socket) ->
-  io:fwrite("received: ~p~n", [Msg]),
-  {noreply, Socket}.
+  ok = gen_udp:close(Socket),
+  exit(io_lib:format("Non-UDP Message: ~p~n", [Msg])).
 
 handle_call(_,_,State) -> {reply, ok, State}.
 

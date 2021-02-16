@@ -10,8 +10,13 @@ main(_Args) ->
  
 loop(Socket) ->
   receive
+    {tcp, _From, ":q!"} ->
+      ok = gen_tcp:close(Socket),
+      halt(0);
     {tcp, _From, Received} ->
       io:fwrite("Received: ~s~n", [Received]),
       loop(Socket);
-    _ -> halt(0)
+    _ ->
+      ok = gen_tcp:close(Socket),
+      halt(0)
   end.

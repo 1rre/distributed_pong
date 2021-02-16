@@ -12,9 +12,10 @@ loop(Socket) ->
   Message = lists:droplast(io:get_line("Enter a message to send to the server ~> ")),
   if
     Message =:= ":q!" -> 
-      gen_tcp:send(Socket, Message),
+      ok = gen_tcp:send(Socket, Message),
+      ok = gen_tcp:close(Socket),
       halt(0);
     true ->
-      gen_tcp:send(Socket, Message),
+      ok = gen_tcp:send(Socket, Message),
       loop(Socket)
   end.
