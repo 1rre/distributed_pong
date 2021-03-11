@@ -37,17 +37,21 @@ object Main extends App {
 
   val nios2cmd = if (windows) "nios2-terminal.exe" else "nios2-terminal"
   val nios2 = s"$nios2cmd -q --persistent --no-quit-on-ctrl-d".run(nios2Io)
-  println("here")
+  
   while (connection.isAlive && nios2.isAlive) {
     if (readData.available > 0) {
       val data = readData.read
       if (data == 'a') connection.send("infoproc_cloud",(self.node.eAtm,(a"led",a"on")).eAuto)
       else if (data == 'b') connection.send("infoproc_cloud",(self.node.eAtm,(a"led",a"off")).eAuto)
     } else if (connection.msgCount > 0) {
-      connection.waitFor[OtpErlangTuple].elementAt(1) match {
-        case msg: OtpErlangAtom if (msg.atomValue == "on") => writeData.write('a')
-        case msg: OtpErlangAtom if (msg.atomValue == "off") => writeData.write('b')
-        case msg => println(s"got $msg") 
+      connection.receive match {
+        case msg: OtpErlangBinary => println(msg.mkString)
+        case tpl: OtpErlangTuple => tpl.elementAt(1) match {
+          case msg: OtpErlangAtom if (msg.atomValue == "on") => writeData.write('a')
+          case msg: OtpErlangAtom if (msg.atomValue == "off") => writeData.write('b')
+          case _ =>
+        }
+        case _ =>
       }
       writeData.flush
     }
