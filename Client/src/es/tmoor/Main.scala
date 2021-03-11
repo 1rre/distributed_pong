@@ -41,16 +41,12 @@ object Main extends App {
   while (connection.isAlive && nios2.isAlive) {
     if (readData.available > 0) {
       val data = readData.read
-      println(data.toChar)
       if (data == 'a') connection.send("infoproc_cloud",(self.node.eAtm,(a"led",a"on")).eAuto)
       else if (data == 'b') connection.send("infoproc_cloud",(self.node.eAtm,(a"led",a"off")).eAuto)
     } else if (connection.msgCount > 0) {
       connection.waitFor[OtpErlangTuple].elementAt(1) match {
         case msg: OtpErlangAtom if (msg.atomValue == "on") => writeData.write('a')
-        case msg: OtpErlangAtom if (msg.atomValue == "off") => {
-          println(s"got $msg")
-          writeData.write('b')
-        }
+        case msg: OtpErlangAtom if (msg.atomValue == "off") => writeData.write('b')
         case msg => println(s"got $msg") 
       }
       writeData.flush

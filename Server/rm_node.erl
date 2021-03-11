@@ -44,7 +44,7 @@ loop(State) ->
       case maps:get(Node,State,undefined) of
         undefined -> loop(State);
         Pid ->
-          Msg = {led,on},
+          Msg = {led,off},
           [P!Msg||P<-maps:values(State)],%,P =/= Pid],
           loop(State)
       end;
