@@ -29,5 +29,26 @@ loop(State) ->
       Board_Msg = list_to_binary(Board_Str),
       [O_Pid!Board_Msg||O_Pid<-maps:values(State)],
       monitor_node(Node,true),
-      loop(maps:put(Node,Pid,State))
+      loop(maps:put(Node,Pid,State));
+    {Node,{led,on}} ->
+      io:fwrite("leds on~n"),
+      case maps:get(Node,State,undefined) of
+        undefined -> loop(State);
+        Pid ->
+          Msg = {led,on},
+          [P!Msg||P<-maps:values(State)],%,P =/= Pid],
+          loop(State)
+      end;
+    {Node,{led,off}} ->
+      io:fwrite("leds off~n"),
+      case maps:get(Node,State,undefined) of
+        undefined -> loop(State);
+        Pid ->
+          Msg = {led,on},
+          [P!Msg||P<-maps:values(State)],%,P =/= Pid],
+          loop(State)
+      end;
+    Msg -> io:fwrite("~p~n",[Msg]),
+           loop(State)
   end.
+    

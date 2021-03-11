@@ -4,6 +4,8 @@ import OtpHelpers._
 import com.ericsson.otp.erlang._
 import sys.process._
 import language.postfixOps
+import java.io.{OutputStream,InputStream}
+import scala.collection.mutable.ListBuffer
 
 object Main extends App {
    // Ensure the port mapper daemon is running
@@ -25,15 +27,40 @@ object Main extends App {
   
   val registration = (self.pid,(a"register",self.node.eAtm)).eAuto
   connection.send("infoproc_cloud", registration)
-  println(connection.waitMsg[OtpErlangBinary].mkString)
+  println(connection.waitFor[OtpErlangBinary].mkString)
 
-  while (connection.isAlive) {
-    connection.receive match {
-      case str: OtpErlangBinary => println(str.mkString)
-      case msg => println(msg)
+  var writeData = OutputStream.nullOutputStream
+  var readData = InputStream.nullInputStream
+  def nios2Input = (in: OutputStream) => writeData = in
+  def nios2Output: InputStream=>Unit = (out: InputStream) => readData = out
+  val nios2Io = new ProcessIO(nios2Input,nios2Output,(err: InputStream) => err.close)
+
+  val nios2cmd = if (windows) "nios2-terminal.exe" else "nios2-terminal"
+  val nios2 = s"$nios2cmd -q --persistent --no-quit-on-ctrl-d".run(nios2Io)
+  println("here")
+  while (connection.isAlive && nios2.isAlive) {
+    if (readData.available > 0) {
+      val data = readData.read
+      println(data.toChar)
+      if (data == 'a') connection.send("infoproc_cloud",(self.node.eAtm,(a"led",a"on")).eAuto)
+      else if (data == 'b') connection.send("infoproc_cloud",(self.node.eAtm,(a"led",a"off")).eAuto)
+    } else if (connection.msgCount > 0) {
+      connection.waitFor[OtpErlangTuple].elementAt(1) match {
+        case msg: OtpErlangAtom if (msg.atomValue == "on") => writeData.write('a')
+        case msg: OtpErlangAtom if (msg.atomValue == "off") => {
+          println(s"got $msg")
+          writeData.write('b')
+        }
+        case msg => println(s"got $msg") 
+      }
+      writeData.flush
     }
   }
-
+  println("Connection to board or server dropped")
+  println(nios2.isAlive)
+  println(connection.isAlive)
+  nios2.destroy
+  connection.close
   self.unPublishPort
 
 }

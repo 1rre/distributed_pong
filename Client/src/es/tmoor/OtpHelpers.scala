@@ -10,7 +10,23 @@ object OtpHelpers {
     def node = new OtpNode(args._1, args._2)
   }
   implicit class `?OtpConnection`(conn: OtpConnection) {
-    def waitMsg[T <: OtpErlangObject] = conn.receive.asInstanceOf[T]
+    def waitFor[T <: OtpErlangObject : Manifest]: T = {
+      val notAccept = collection.mutable.ListBuffer[OtpMsg]()
+      def loop: T = {
+        val msg = conn.receiveMsg
+        msg.getMsg match {
+          case obj: T => {
+            notAccept.foreach(conn.deliver(_))
+            obj
+          }
+          case _ => {
+            notAccept += msg
+            loop
+          }
+        }
+      }
+      loop
+    }
   }
   implicit class `Int->OtpErlangInt`(obj: Int) {
     def eInt = new OtpErlangInt(obj)
