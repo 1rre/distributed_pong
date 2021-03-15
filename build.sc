@@ -15,3 +15,7 @@ object Client extends ScalaModule {
 object Local extends ScalaModule {
   def scalaVersion = "2.13.5"
 }
+
+object Testing extends ScalaModule {
+  def scalaVersion = "2.13.5"
+}
