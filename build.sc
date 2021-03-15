@@ -11,3 +11,7 @@ object Client extends ScalaModule {
     else Agg.from(os.list(millSourcePath / "lib").map(PathRef(_)))
   }
 }
+
+object Local extends ScalaModule {
+  def scalaVersion = "2.13.5"
+}

@@ -36,6 +36,7 @@ int main() {
 		  fprintf(fp,"%c\n",'b');
 		  led_on++;
 	  }
+    fflush(fp);
   }
   printf("Complete\n");
 
