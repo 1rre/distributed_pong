@@ -2,20 +2,26 @@ package game
 
 import java.awt.{event,Frame}
 import event.{KeyEvent,KeyListener}
-import Monitor._
+import connection.OtpHelpers._
+import connection.Node._
 
 
+class Controller(game: Game) extends Frame with KeyListener {
 
-class Controller extends Frame with KeyListener {
-  val diff = (256 / Monitor.game.rows)
+  private def player1 = game.players(0)
+  private def diff = 16 + util.Random.nextInt(3)-2
   def keyTyped(e: KeyEvent) = {}
 
   def keyPressed(e: KeyEvent) = e.getKeyCode match {
     case KeyEvent.VK_DOWN => {
-      player1() = player1.x + diff
+      val move = math.min(player1.y+diff,255)
+      player1(move)
+      connection.send("pong_server",(a"change_pos",pid,move).toOTP)
     }
     case KeyEvent.VK_UP => {
-      player1() = player1.x - diff
+      val move = math.max(player1.y-diff,0)
+      player1(move)
+      connection.send("pong_server",(a"change_pos",pid,move).toOTP)
     }
     case _ =>
   }
@@ -24,5 +30,4 @@ class Controller extends Frame with KeyListener {
 
   addKeyListener(this)
   show
-  
 }

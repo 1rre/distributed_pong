@@ -1,6 +1,8 @@
 -module(pong_server).
 
 -export([start_link/0,init/0]).
+-define(TICK_RATE,25).
+
 
 -spec start_link() -> gen_event:result().
 
@@ -14,7 +16,7 @@ init() ->
   io:fwrite("Starting pong server~n"),
   register(pong_server,self()),
   Ref = make_ref(),
-  timer:send_interval(100,self(),{Ref,tick}),
+  timer:send_interval(?TICK_RATE,self(),{Ref,tick}),
   loop(#{},Ref).
 
 
@@ -36,6 +38,10 @@ loop(Nodes,Ref) -> receive
     gen_server:cast(pong_game,tick),
     loop(Nodes,Ref);
   {change_pos,Pid,Pos} ->
+    io:fwrite("Changing to ~p~n",[Pos]),
     gen_server:cast(pong_game,{change_pos,Pid,Pos}),
+    loop(Nodes,Ref);
+  Msg ->
+    io:fwrite("~p~n",[Msg]),
     loop(Nodes,Ref)
 end.

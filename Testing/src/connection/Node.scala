@@ -6,20 +6,13 @@ import util.Random.alphanumeric
 import language.postfixOps
 
 object Node {
-  def test = {
-    val ip = "tm"
-    val uid = alphanumeric take 16 mkString
-    val local = new OtpSelf(s"$uid@$ip","let's play pong")
-    val remote = new OtpPeer(s"pong@$ip")
-    val connection = local connect remote
+  private val ip = "tm"
+  private val uid = alphanumeric take 16 mkString
+  private val local = new OtpSelf(s"$uid@$ip","let's play pong")
+  private val remote = new OtpPeer(s"pong@$ip")
 
-    println(connection isAlive)
+  val connection = local connect remote
+  val pid = local pid
 
-    val msg = (a"register", local pid, local node) toOTP
-
-    connection send ("pong_server", msg)
-
-    for (_ <- 1 to 10) println(connection receive)
-    
-  }
+  connection send("pong_server", (a"register", local pid, local node) toOTP)
 }
