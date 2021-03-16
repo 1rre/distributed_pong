@@ -1,8 +1,10 @@
 
-import game._
+import game._, connection._
 import Monitor._
+import language.postfixOps
 
 object Main extends App {
+/*
   var diff = (256 / Monitor.game.rows)
   val ctrl = new Controller
   Monitor
@@ -18,6 +20,9 @@ object Main extends App {
     Thread.sleep(100)
     print(game)
   }
+*/
+
+  Node test
 
 }
 

@@ -5,3 +5,4 @@ _build/
 out/
 .coursier
 Board/lab3_v2
+**/*.beam

@@ -18,4 +18,9 @@ object Local extends ScalaModule {
 
 object Testing extends ScalaModule {
   def scalaVersion = "2.13.5"
+
+  def unmanagedClasspath = T {
+    if (!os.exists(millSourcePath / "lib")) Agg()
+    else Agg.from(os.list(millSourcePath / "lib").map(PathRef(_)))
+  }
 }
