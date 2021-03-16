@@ -12,6 +12,7 @@ object Monitor {
   class Game {
     print("\u001b[?25l")
     case class Player(num: Int) {
+      this() = 127
       var x: Int = 127
       val y: Int = if (num == 1) 0 else (cols-1)
       def chars = ((x-4) * rows / 255d).toInt to ((x+4) * rows / 255d).toInt
