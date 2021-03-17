@@ -6,7 +6,7 @@ import collection.mutable.ListBuffer
 import com.ericsson.otp.erlang._
 
 class Game {
-  val paddleSize = 200
+  val paddleSize = 25
   print("\u001b[?25l")
   case class Player(num: Int) {
     var x = num match {

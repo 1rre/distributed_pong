@@ -4,7 +4,7 @@
 -export([start_link/0,init/1]).
 -export([handle_call/3,handle_cast/2]).
 
--define(PADDLE_SIZE,200).
+-define(PADDLE_SIZE,25).
 -define(BALL_SPEED,2).
 -define(SPEED_INCREASE,0.125).
 -define(SKEW_FACTOR,1.5).
