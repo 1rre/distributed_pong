@@ -340,7 +340,7 @@ get_board(Pid,Board=#board{players={A,B,C=#player{pid=Pid},D}, ball=Ball=#ball{p
 
 get_board(Pid,Board=#board{players={A,B,C,D=#player{pid=Pid}}, ball=Ball=#ball{pos=Pos}}) ->
   New_Ball_Pos = Pos#vector{x=255-Pos#vector.y, y=Pos#vector.x},
-  Flipped_Board = Board#board{players={B,A,D,C},ball=Ball#ball{pos=New_Ball_Pos}},
+  Flipped_Board = Board#board{players={D,C,A,B},ball=Ball#ball{pos=New_Ball_Pos}},
   get_board(Pid,Flipped_Board);
 
 get_board(Pid,Board) ->
