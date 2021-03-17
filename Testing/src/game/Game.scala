@@ -43,7 +43,7 @@ class Game {
       }
       chars foreach {
         case n if num <= 2 && (1 until rows-1 contains n) => buffer(n)((x*cols)/256) = '#'
-        case n if 1 until cols-1 contains n => buffer((y*rows)/256)(n) = '#'
+        case n if num > 3 && (1 until cols-1 contains n) => buffer((y*rows)/256)(n) = '#'
         case _ =>
       }
     }
