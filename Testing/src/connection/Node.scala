@@ -6,7 +6,7 @@ import util.Random.alphanumeric
 import language.postfixOps
 
 object Node {
-  private val ip = "tm"
+  private val ip = "35.242.152.130"
   private val uid = alphanumeric take 16 mkString
   private val local = new OtpSelf(s"$uid@$ip","let's play pong")
   private val remote = new OtpPeer(s"pong@$ip")
