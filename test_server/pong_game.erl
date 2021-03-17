@@ -219,16 +219,20 @@ bounce(top,Ball,{X1,Y1},{X2,Y2},Player) ->
   io:fwrite("top~n"),
   case detect_collision(Y1,X1,Y2,X2,0,Player) of
     {_,false} -> {new_ball(),Ball#ball.last_touch};
-    {0, _} -> bounce_wall(x,Ball);
-    {Diff, _} -> bounce_paddle(x,Diff,Ball)
+    {0, _} ->
+      io:fwrite("Wall~n"),
+      bounce_wall(y,Ball);
+    {Diff, _} ->
+      io:fwrite("Paddle: ~p~n",[Diff]),
+      bounce_paddle(y,Diff,Ball)
   end;
 
 bounce(bottom,Ball,{X1,Y1},{X2,Y2},Player) ->
   io:fwrite("bottom~n"),
   case detect_collision(Y1,X1,Y2,X2,255,Player) of
     {_,false} -> {new_ball(),Ball#ball.last_touch};
-    {0, _} -> bounce_wall(x,Ball);
-    {Diff, _} -> bounce_paddle(x,Diff,Ball)
+    {0, _} -> bounce_wall(y,Ball);
+    {Diff, _} -> bounce_paddle(y,Diff,Ball)
   end;
 
 bounce(_,Ball,_,_,_) ->
