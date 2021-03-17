@@ -25,7 +25,7 @@ class Game {
       case 1 => ((y-paddleSize/2) * rows / 255d).ceil.toInt to ((y+paddleSize/2) * rows / 255)
       case 2 => ((255-paddleSize/2-y) * rows / 255d).ceil.toInt to ((255+paddleSize/2-y) * rows / 255)
       case 3 => ((x-paddleSize/2) * cols / 255d).ceil.toInt to ((x+paddleSize/2) * cols / 255)
-      case 4 => ((255-paddleSize/2-x) * cols / 255d).ceil.toInt to ((255-paddleSize/2-x) * cols / 255)
+      case 4 => ((255-paddleSize/2-x) * cols / 255d).ceil.toInt to ((255+paddleSize/2-x) * cols / 255)
     }
 
     def apply(n: Int): Unit = {
@@ -43,7 +43,7 @@ class Game {
       }
       chars foreach {
         case n if num <= 2 && (1 until rows-1 contains n) => buffer(n)((x*cols)/256) = '#'
-        case n if num > 3 && (1 until cols-1 contains n) => buffer((y*rows)/256)(n) = '#'
+        case n if num >= 3 && (1 until cols-1 contains n) => buffer((y*rows)/256)(n) = '#'
         case _ =>
       }
     }
