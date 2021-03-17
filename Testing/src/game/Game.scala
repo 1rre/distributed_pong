@@ -29,6 +29,11 @@ class Game {
     }
 
     def apply(n: Int): Unit = {
+      chars foreach {
+        case n if num <= 2 && (1 until rows-1 contains n) => buffer(n)((x*cols)/256) = ' '
+        case n if num >= 3 && (1 until cols-1 contains n) => buffer((y*rows)/256)(n) = ' '
+        case _ =>
+      }
       x = num match {
         case 1 => 0
         case 2 => 255
@@ -67,10 +72,11 @@ class Game {
     var x = 127.5
     var y = 127.5
     def apply(newX: Double, newY: Double) = {
-      buffer mapInPlace (_ mapInPlace(_ => ' '))
+      //buffer mapInPlace (_ mapInPlace(_ => ' '))
+      buffer((x * rows / 256).round toInt)((y * cols / 256).round toInt) = ' '
       x = newX
       y = newY
-      buffer((x * rows / 255) toInt)((y * cols / 255) toInt) = 'O'
+      buffer((x * rows / 256).round toInt)((y * cols / 256).round toInt) = 'O'
     }
   }
 

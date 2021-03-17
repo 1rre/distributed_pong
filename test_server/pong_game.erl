@@ -284,12 +284,12 @@ bounce_paddle(x,Diff,Ball=#ball{dir=#vector{x=X,y=Y}}) ->
   Skew = Diff / ?PADDLE_SIZE * ?SKEW_FACTOR * Ball#ball.speed,
   io:fwrite("Speed: ~p~n",[Ball#ball.speed]),
   N_Speed = Ball#ball.speed+?SPEED_INCREASE,
-  Ball#ball{dir=normalise(#vector{x=-X-Skew,y=Y},N_Speed),speed=N_Speed};
+  Ball#ball{dir=normalise(#vector{x=-X,y=Y+Skew},N_Speed),speed=N_Speed};
 bounce_paddle(y,Diff,Ball=#ball{dir=#vector{x=X,y=Y}}) ->
   Skew = 1 - abs(Diff / ?PADDLE_SIZE),
   io:fwrite("Speed: ~p~n",[Ball#ball.speed]),
   N_Speed = Ball#ball.speed+?SPEED_INCREASE,
-  Ball#ball{dir=normalise(#vector{x=X,y=-Y-Skew},N_Speed),speed=N_Speed};
+  Ball#ball{dir=normalise(#vector{x=X+Skew,y=-Y},N_Speed),speed=N_Speed};
 bounce_paddle(xy,_,Ball) ->
   bounce_wall(xy,Ball).
 
