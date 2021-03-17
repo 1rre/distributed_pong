@@ -74,8 +74,8 @@ class Game {
     def apply(newX: Double, newY: Double) = {
       //buffer mapInPlace (_ mapInPlace(_ => ' '))
       buffer((x * rows / 256).round toInt)((y * cols / 256).round toInt) = ' '
-      x = newX
-      y = newY
+      x = if (((newX * rows / 256).round toInt) >= rows) rows - 1 else newX
+      y = if (((newY * cols / 256).round toInt) >= cols) cols - 1 else newY
       buffer((x * rows / 256).round toInt)((y * cols / 256).round toInt) = 'O'
     }
   }
