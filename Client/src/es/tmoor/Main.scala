@@ -1,7 +1,7 @@
 package es.tmoor
 
-import OtpHelpers._
-import com.ericsson.otp.erlang._
+//import OtpHelpers._
+//import com.ericsson.otp.erlang._
 import sys.process._
 import language.postfixOps
 import java.io.{OutputStream,InputStream}
@@ -10,7 +10,7 @@ import scala.collection.mutable.ListBuffer
 object Main extends App {
    // Ensure the port mapper daemon is running
   val windows = sys.props.get("os.name") != Some("Linux") // Sorry Mac users haha
-  val epmd = if (windows) """C:\'Program Files'\erl-23.0\erts-11.0\bin\epmd.exe""" else "epmd"
+/*  val epmd = if (windows) """C:\'Program Files'\erl-23.0\erts-11.0\bin\epmd.exe""" else "epmd"
   val exitcode = s"$epmd -names"!
 
   if (exitcode != 0)
@@ -29,7 +29,7 @@ object Main extends App {
   val registration = (self.pid,(a"register",self.node.eAtm)).eAuto
   connection.send("infoproc_cloud", registration)
   println(connection.waitFor[OtpErlangBinary].mkString)
-
+*/
   // Set up the input & output streams
   var writeData = null.asInstanceOf[OutputStream]
   var readData = null.asInstanceOf[InputStream]
@@ -43,8 +43,8 @@ object Main extends App {
   Runtime.getRuntime.addShutdownHook(new Thread {
     override def run = {
       if (!nios2.isAlive) println("Connection to Nios2 Terminal dropped")
-      if (!connection.isAlive) print("Connection to Server dropped")
-      connection.close
+//      if (!connection.isAlive) print("Connection to Server dropped")
+//      connection.close
       writeData.close
       readData.close
       nios2.destroy
@@ -52,13 +52,16 @@ object Main extends App {
   })
   
   // While we are still connected to both the server & board
-  while (connection.isAlive && nios2.isAlive) {
+  while (/*connection.isAlive &&*/ nios2.isAlive) {
     // If we have output waiting from the board, read it & handle it accordingly
     if (readData.available > 0) {
       val data = readData.read
+      println(data)
+      /*
       if (data == 'a') connection.send("infoproc_cloud",(self.node.eAtm,(a"led",a"on")).eAuto)
       else if (data == 'b') connection.send("infoproc_cloud",(self.node.eAtm,(a"led",a"off")).eAuto)
-    }
+      */
+    }/*
     // If we have messages waiting from the server then recieve them & handle them accordingly
     else if (connection.msgCount > 0) {
       connection.receive match {
@@ -73,7 +76,7 @@ object Main extends App {
         case _ =>
       }
       writeData.flush
-    }
+    }*/
   }
 
 }
