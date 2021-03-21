@@ -17,6 +17,9 @@ object Node {
 
   // Connect to the remote node from the local node
   val connection = local connect remote
+  
+  Runtime.getRuntime.addShutdownHook(new Thread {override def run = {connection.close}})
+
   // Store the PID so we don't have to get it every time
   val pid = local pid
 

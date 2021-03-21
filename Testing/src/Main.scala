@@ -19,7 +19,7 @@ object Main extends App {
 
   val nios = new Interface
 
-  while (true) {
+  while (connection.isAlive && nios.nios2.isAlive) {
     if (connection.msgCount > 0) {
       val msg = connection.waitFor[ErlTuple]
       msg elementAt 0 match {
@@ -48,6 +48,9 @@ object Main extends App {
       connection.send("pong_server", (a"change_pos", pid, read) toOTP)
     }
   }
+
+  if (!connection.isAlive) println("Connection Dropped")
+  if (!nios.nios2.isAlive) println("Nios2 Dropped")
 
 
 }
