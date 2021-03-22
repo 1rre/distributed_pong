@@ -16,7 +16,7 @@ Erlang/OTP v22 or later (available in apt package `erlang`, the smaller `erlang-
 
 == Client
 === Files
-The Scala source files which are run locally are in the directory link:Client[Client/].
+The Scala source files which are run locally are in the directory link:Client/[Client].
 
 === Dependencies
 Java version 8 or later. +
