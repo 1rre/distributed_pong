@@ -19,6 +19,13 @@ object Main extends App {
 
   val nios = new Interface
 
+  // Align the input so that we're reading the data & not the newlines
+  def alignInput: Unit =
+    if (nios.readData.available == 0) alignInput
+    else if (nios.readData.read != 10) alignInput
+
+  alignInput
+  
   while (connection.isAlive && nios.nios2.isAlive) {
     if (connection.msgCount > 0) {
       val msg = connection.waitFor[ErlTuple]
@@ -39,13 +46,16 @@ object Main extends App {
           }
         case new_score: Atom if new_score.atomValue == "new_score" =>
           val toNios = (msg elementAt 1).asInstanceOf[ErlInt].byteValue
-
           nios.writeData write toNios
       }
+      print(game)
     }
     else if (nios.readData.available >= 2) {
-      val read = nios.readData read; nios.readData read;
+      val read = nios.readData.read;nios.readData.read
+      //println(read)
       connection.send("pong_server", (a"change_pos", pid, read) toOTP)
+      game.players(0)(read)
+      //print(game)
     }
   }
 
