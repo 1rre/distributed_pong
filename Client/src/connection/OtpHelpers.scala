@@ -7,18 +7,21 @@ import reflect.ClassTag
 // Implicit classes essentially add members to a given class, stated in brackets after the name
 
 object OtpHelpers {
-  // Convert an Erlang binary to a Java string (it just works)
+  // Convert an Erlang binary to a Java string
   implicit class `OtpErlangBinary->String`(bin: OtpErlangBinary) {
     def mkString = bin.binaryValue.map(_.toChar).mkString
   }
-  // This isn't used here but idk I use this file in multiple projects so I kinda wanna keep it around
+  // Convert an Erlang tuple to a Scala list
+  implicit class `OtpErlangTuple->List`(tuple: OtpErlangTuple) {
+    def toList = tuple.elements.toList
+  }
+  // This isn't used here but is helpful generally
   implicit class `Tuple2->OtpNode`(args: Tuple2[String, String]) {
     def node = new OtpNode(args._1, args._2)
   }
   // Extend the connection class by adding a function to wait for a certain type of message & return any other messages to the queue
   implicit class `?OtpConnection`(conn: OtpConnection) {
-    // Just look at that polymorphism <3
-    // Basically T is anything which inherits from an Erlang object
+    // T is anything which inherits from an Erlang object
     // we want T to be the same T each time it is used so we keep a tag at runtime
     def waitFor[T <: OtpErlangObject : ClassTag]: T = {
       val notAccept = collection.mutable.ListBuffer[OtpMsg]()
@@ -47,7 +50,7 @@ object OtpHelpers {
       loop
     }
   }
-  // Java into to Erlang int
+  // Java int to Erlang int
   implicit class `Int->OtpErlangInt`(obj: Int) {
     def eInt = new OtpErlangInt(obj)
   }
@@ -79,6 +82,11 @@ object OtpHelpers {
     def eLst = new OtpErlangList(obj.map(_.toOTP))
     def eTpl = new OtpErlangTuple(obj.map(_.toOTP))
   }
+  // Scala sequential dataset to Erlang list or tuple
+  implicit class `Seq->OtpErlang(List|Tuple)`(obj: Seq[_]) {
+    def eLst = new OtpErlangList(obj.map(_.toOTP).toArray)
+    def eTpl = new OtpErlangTuple(obj.map(_.toOTP).toArray)
+  }
   // Scala tuple to Erlang list or tuple
   implicit class `Product->OtpErlang(Tuple|List)`(obj: Product) {
     def eTpl = new OtpErlangTuple(obj.productIterator.map(_.toOTP).toArray)
@@ -91,6 +99,7 @@ object OtpHelpers {
       case d: Double => d.eDbl
       case s: String => s.eAtm
       case a: Array[_] => a.eLst
+      case l: Seq[_] => l.eTpl
       case t: Product => t.eTpl
       case o: OtpErlangObject => o
       case _ => sys.error("Type not found")

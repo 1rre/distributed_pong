@@ -16,21 +16,21 @@ class Game {
   // Player class
   case class Player(num: Int) {
     // Set the x position based on the player number
-    var x = num match {
+    private var x = num match {
       case 1 => 0
       case 2 => 255
       case _ => 127
     }
     
     // Set the y position based on the player number
-    var y = num match {
+    private var y = num match {
       case 3 => 0
       case 4 => 255
       case _ => 127
     }
 
     // Function to get the current screen range taken up by the player based on the current position & paddle size
-    def chars = num match {
+    private def chars = num match {
       case 1 => ((y-paddleSize/2) * rows / 255d).ceil.toInt to ((y+paddleSize/2) * rows / 255)
       case 2 => ((255-paddleSize/2-y) * rows / 255d).ceil.toInt to ((255+paddleSize/2-y) * rows / 255)
       case 3 => ((x-paddleSize/2) * cols / 255d).ceil.toInt to ((x+paddleSize/2) * cols / 255)
@@ -86,16 +86,17 @@ class Game {
 
   // The ball is an object as there's only 1 of them
   object Ball {
-    var x = 127.5
-    var y = 127.5
+    private var x = 127.5
+    private var y = 127.5
     // Override () operator to change the position of the ball when called with 2 doubles
     def apply(newX: Double, newY: Double) = {
       // Change the previous position of the ball to spaces (ie clear it) in the buffer
       buffer((x * rows / 256).round toInt)((y * cols / 256).round toInt) = ' '
       // Change the position of the ball, making sure it isn't out of range of the array
-      // This is somehow glitched & I wanna find out why
-      x = if (((newX * rows / 256).round toInt) >= rows) rows - 1 else newX
-      y = if (((newY * cols / 256).round toInt) >= cols) cols - 1 else newY
+      // This looks weird but we need to round to the nearest multiple of rows-1/cols-1 to 255 to avoid segfaults
+      x = if (((newX * rows / 256).round toInt) >= rows) (255 / (rows-1)) * (rows-1) else newX
+      y = if (((newY * cols / 256).round toInt) >= cols) (255 / (cols-1)) * (cols-1) else newY
+      println((x,y))
       // Set the current position of the ball to an 'O'
       buffer((x * rows / 256).round toInt)((y * cols / 256).round toInt) = 'O'
     }
@@ -104,8 +105,8 @@ class Game {
   // Make an array of size 4 for the players
   val players = Array.tabulate(4)(n => Player(n+1))
   // Run a bash command to get the number of columns & rows
-  val cols = "bash -c 'tput cols'".!!.trim toInt
-  val rows = "bash -c 'tput lines'".!!.trim toInt
+  private val cols = "bash -c 'tput cols'".!!.trim toInt
+  private val rows = "bash -c 'tput lines'".!!.trim toInt
   // Create the buffer by filling a space equivalent to the screen size with spaces
   private val buffer = Array.fill(rows, cols)(' ')
   // Change the string representation of the game to a command to clear the screen

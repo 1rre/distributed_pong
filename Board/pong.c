@@ -46,7 +46,7 @@ void update_xval(){
     else if (x_read*multi < 64) x_val = no_overflow(x_val,256*multi);
     else if (x_read*multi < 128) x_val = no_overflow(x_val,384*multi);
     else if (x_read*multi < 192) x_val = no_overflow(x_val,768*multi);
-    else x_val = no_overflow(x_val,640*multi);
+    else x_val = no_overflow(x_val,1024*multi);
     led_write(x_val>>8);
     //printf("xvalue = %d, x_read %d\n",x_val,x_read);
     fprintf(fp,"%c\n",x_val>>8);

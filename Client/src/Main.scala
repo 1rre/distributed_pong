@@ -1,11 +1,10 @@
 
 import game.Game
-import connection.OtpHelpers._
-import connection.Node._
-import nios.Interface
+import connection.{OtpHelpers,Node}
+import OtpHelpers._
+import nios.Nios2Interface
 import com.ericsson.otp.erlang._
 import language.postfixOps
-import scala.collection.immutable
 
 object Main extends App {
   // Typedefs because those types are long haha
@@ -14,53 +13,60 @@ object Main extends App {
   type ErlInt = OtpErlangLong
   type Atom = OtpErlangAtom
 
-  // Make a new game
+  // Make a new game & connection to the nios2 board
   val game = new Game
-
-  val nios = new Interface
+  val nios = new Nios2Interface
+  val node = new Node
 
   // Align the input so that we're reading the data & not the newlines
+  // This should be do-able as a while loop but when I tried it didn't work
   def alignInput: Unit =
-    if (nios.readData.available == 0) alignInput
-    else if (nios.readData.read != 10) alignInput
+    if (!nios.isAlive) sys error "Nios2 didn't start"
+    else if (!nios.ready) alignInput
+    else if (nios.read != 10) alignInput
 
   alignInput
   
-  while (connection.isAlive && nios.nios2.isAlive) {
-    if (connection.msgCount > 0) {
-      val msg = connection.waitFor[ErlTuple]
-      msg elementAt 0 match {
-        case ok: Atom if ok.atomValue == "ok" =>
-          (msg elementAt 1).asInstanceOf[ErlTuple].elements toList match {
+  // While we are still connected to both the board & the server 
+  while (node.isAlive && nios.isAlive) {
+    if (node.hasMsg) {
+      val msg = node.getTupleMsg
+      // Check the type of message & resolve it accordingly
+      msg match {
+        // 'ok' as the 1st element could only be a frame to print 
+        case List(ok: Atom, newState: ErlTuple) if ok.atomValue == "ok" =>
+          newState toList match {
             case List(ball: ErlTuple, players: ErlTuple) => {
-              ball.elements.toList match {
+              ball toList match {
                 case List(x: ErlFloat, y: ErlFloat) =>
                   // Update the ball positions to those included in the message
                   game.Ball(x.doubleValue,y.doubleValue)
-                case other =>
+                // This is to avoid crashes: "do nothing if it doesn't match"
+                case _ =>
               }
               // Update each of the players to the positions sent in the message
-              players.elements.zip(game.players).map(x => x._2(x._1))
+              players.toList.zip(game.players).map(x => x._2(x._1))
             }
-            case other =>
+            case _ =>
           }
-        case new_score: Atom if new_score.atomValue == "new_score" =>
-          val toNios = (msg elementAt 1).asInstanceOf[ErlInt].byteValue
-          nios.writeData write toNios
+        // 'new_score' as the 1st element means we have a new score to display
+        case List(new_score: Atom, erlScore: ErlInt) if new_score.atomValue == "new_score" =>
+          val score = erlScore.byteValue
+          nios write score
+        case _ =>
       }
+      // Print the current game state using to overloaded 'toString'
       print(game)
-    }
-    else if (nios.readData.available >= 2) {
-      val read = nios.readData.read;nios.readData.read
-      //println(read)
-      connection.send("pong_server", (a"change_pos", pid, read) toOTP)
-      game.players(0)(read)
-      //print(game)
+    } else if (nios ready) {
+      // Read 1 byte & ignore another
+      val newPos = nios.read; nios.skip
+      // Send a message saying 'change_pos', our process id and the new position to 'pong_server'
+      node.send(a"change_pos", node pid, newPos)
     }
   }
 
-  if (!connection.isAlive) println("Connection Dropped")
-  if (!nios.nios2.isAlive) println("Nios2 Dropped")
+  if (!node.isAlive) println("Connection Dropped")
+  if (!nios.isAlive) println("Nios2 Dropped")
 
 
 }
