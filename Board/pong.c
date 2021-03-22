@@ -9,7 +9,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 // This changes the speed of the thing
-#define SLEEP_TIME 50000
+#define SLEEP_TIME 40000
 FILE* fp;
 alt_32 x_read;
 alt_u16 x_val = 127<<8;
@@ -31,22 +31,15 @@ void led_write(alt_u8 led_pattern) {
     IOWR(LED_BASE, 0, led_pattern);
 }
 
-alt_16 no_overflow(alt_u16 last, alt_16 change) {
-	if (change>0) return 0xFFFF-(alt_32)change<last?0xFFFF:last+change;
+alt_16 no_overflow(alt_u16 last, alt_32 change) {
+	if (change>0) return 0xFFFF-change<last?0xFFFF:last+change;
 	if (change<0) return 0-change>last?0:last+change;
 	return last;
 }
 
 void update_xval(){
     alt_up_accelerometer_spi_read_x_axis(acc_dev, & x_read);
-    alt_8 multi = x_read>0?1:-1;
-    if (x_read*multi < 8) x_val = no_overflow(x_val,8*multi);
-    else if (x_read*multi < 16) x_val = no_overflow(x_val,32*multi);
-    else if (x_read*multi < 32) x_val = no_overflow(x_val,96*multi);
-    else if (x_read*multi < 64) x_val = no_overflow(x_val,256*multi);
-    else if (x_read*multi < 128) x_val = no_overflow(x_val,384*multi);
-    else if (x_read*multi < 192) x_val = no_overflow(x_val,768*multi);
-    else x_val = no_overflow(x_val,1024*multi);
+    x_val = no_overflow(x_val,4*x_read);
     led_write(x_val>>8);
     //printf("xvalue = %d, x_read %d\n",x_val,x_read);
     fprintf(fp,"%c\n",x_val>>8);

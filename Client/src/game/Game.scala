@@ -96,7 +96,6 @@ class Game {
       // This looks weird but we need to round to the nearest multiple of rows-1/cols-1 to 255 to avoid segfaults
       x = if (((newX * rows / 256).round toInt) >= rows) (255 / (rows-1)) * (rows-1) else newX
       y = if (((newY * cols / 256).round toInt) >= cols) (255 / (cols-1)) * (cols-1) else newY
-      println((x,y))
       // Set the current position of the ball to an 'O'
       buffer((x * rows / 256).round toInt)((y * cols / 256).round toInt) = 'O'
     }
