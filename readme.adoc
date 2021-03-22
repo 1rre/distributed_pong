@@ -21,4 +21,4 @@ The Scala source files which are run locally are in the directory link:Client[Cl
 === Dependencies
 Java version 8 or later. +
 The application `nios2-terminal(.exe)` must be located on your path. +
-A wrapper for the link:Mill[https://com-lihaoyi.github.io/mill/] build tool has been included for compiling the project: one can run the project directly with `./mill -i Client.run`, or compile the project with `./mill Client.assembly` & use Java to run the project with `java -jar out/Client/assembly/dest/out.jar`
+A link:mill[wrapper] for the link:https://com-lihaoyi.github.io/mill/[Mill] build tool has been included for compiling the project: one can run the project directly with `./mill -i Client.run`, or compile the project with `./mill Client.assembly` & use Java to run the project with `java -jar out/Client/assembly/dest/out.jar`
