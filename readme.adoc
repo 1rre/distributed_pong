@@ -1,0 +1,24 @@
+= Group 15 Information Processing project
+
+== Board
+=== Files
+The [C source file](Board/pong.c) for the code running on the DE10-Lite as well as the link:Board/Pong_DE10_Lite.qsys[qsys], link:Board/DE10_LITE_Golden_Top.v[verilog] & link:Board/Pong_DE10_Lite.sopcinfo[sopcinfo] files used to generate the Eclipse project are in link:Board/[Board].
+
+=== Dependencies
+You must have a DE10-Lite board plugged in with included link:Board/Pong_DE10_Lite.sof[sof file] flashed, along with a means of generating an ELF file & flashing it to the board.
+
+== Server
+=== Files
+The Erlang source files which run in the cloud are in the directory link:Server/[Server]. The 2 most noteworthy are the link:Server/pong_server.erl[pong server] module, which deals with network communcation with players and the link:Server/pong_game.erl[pong game] module, which keeps track of and updates the current game state.
+
+=== Dependencies
+Erlang/OTP v22 or later (available in apt package `erlang`, the smaller `erlang-base` may also work)
+
+== Client
+=== Files
+The Scala source files which are run locally are in the directory link:Client[Client/].
+
+=== Dependencies
+Java version 8 or later. +
+The application `nios2-terminal(.exe)` must be located on your path. +
+A wrapper for the link:Mill[https://com-lihaoyi.github.io/mill/] build tool has been included for compiling the project: one can run the project directly with `./mill -i Client.run`, or compile the project with `./mill Client.assembly` & use Java to run the project with `java -jar out/Client/assembly/dest/out.jar`
