@@ -26,7 +26,7 @@ class Nios2Interface {
   def write(data: Int) = writeData write data
   def read = readData.read
   def skip: Unit = readData.read
+  def exit = {writeData.close; readData.close; nios2.destroy}
 
-  // Close the io streams & SIGKILL the process as part of the JVM shutdown
-  Runtime.getRuntime addShutdownHook new Thread {override def run = {writeData close; readData close; nios2 destroy}}
+  Runtime.getRuntime.addShutdownHook(new Thread {override def run = exit})
 }

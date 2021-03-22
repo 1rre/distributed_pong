@@ -20,7 +20,7 @@ class Node {
   // Connect to the remote node from the local node
   private val connection = local connect remote
   
-  Runtime.getRuntime addShutdownHook new Thread {override def run = {connection.close}}
+  //Runtime.getRuntime addShutdownHook new Thread {override def run = {connection.close}}
 
   // Store the PID so we don't have to get it every time
   val pid = local pid
@@ -31,7 +31,10 @@ class Node {
   def getTupleMsg = connection.waitFor[OtpErlangTuple].toList
   // This isn't a pointer, it's analagous to `...` in C/C++
   def send(msg: Any*) = connection.send(serverName, msg toOTP)
+  def exit = connection.close
 
+
+  Runtime.getRuntime.addShutdownHook(new Thread {override def run = exit})
   // Send a message to the registered name "pong server" through the connection
   // to register as a player with our process ID and local node
   send(a"register", pid, local node)

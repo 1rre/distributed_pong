@@ -6,12 +6,11 @@ import collection.mutable.ListBuffer
 import com.ericsson.otp.erlang._
 
 class Game {
+  // Re-enable the cursor when the game exits
   // Constant paddle size (can be tweaked)
   val paddleSize = 25
   // Hide the cursor
   print("\u001b[?25l")
-  // Re-enable the cursor when the game exits
-  Runtime.getRuntime.addShutdownHook(new Thread {override def run = print("\u001b[?25h")})
 
   // Player class
   case class Player(num: Int) {
@@ -111,4 +110,6 @@ class Game {
   // Change the string representation of the game to a command to clear the screen
   // followed by the buffer & finally a command to move the cursor to the top left of the screen
   override def toString = s"\u001b[3J${buffer map (_ mkString) mkString "\n"}\u001b[0;0H"
+
+  Runtime.getRuntime.addShutdownHook(new Thread {override def run = print("\u001b[?25h")})
 }

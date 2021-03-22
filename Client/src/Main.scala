@@ -5,6 +5,7 @@ import OtpHelpers._
 import nios.Nios2Interface
 import com.ericsson.otp.erlang._
 import language.postfixOps
+import sys.process._
 
 object Main extends App {
   // Typedefs because those types are long haha
@@ -64,10 +65,6 @@ object Main extends App {
       node.send(a"change_pos", node pid, newPos)
     }
   }
-
-  if (!node.isAlive) println("Connection Dropped")
-  if (!nios.isAlive) println("Nios2 Dropped")
-
 
 }
 
