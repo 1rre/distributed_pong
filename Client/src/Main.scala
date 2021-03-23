@@ -23,8 +23,7 @@ object Main extends App {
   // This should be do-able as a while loop but when I tried it didn't work
   def alignInput: Unit =
     if (!nios.isAlive) sys error "Nios2 didn't start"
-    else if (!nios.ready) alignInput
-    else if (nios.read != 10) alignInput
+    else if (!nios.ready || nios.read != 10) alignInput
 
   alignInput
   // While we are still connected to both the board & the server 
@@ -54,10 +53,9 @@ object Main extends App {
           val score = Array[Byte]('\u001b','g',erlScore.byteValue)
           nios write score
         case List(speed: Atom, newSpeed: ErlFloat) if speed.atomValue == "speed" =>
-          val speed = Array[Byte]('\u001b','s',newSpeed.doubleValue.toByte)
-          println(speed.toList)
+          val speed = Array[Byte]('\u001b','s',(newSpeed.doubleValue*2).toByte)
           nios write speed
-        case other => println(other)
+        case _ =>
       }
       // Print the current game state using to overloaded 'toString'
       print(game)

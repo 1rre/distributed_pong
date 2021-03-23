@@ -90,6 +90,8 @@ handle_cast(tick,Board) ->
       % Send the player who scored their new score
       % `lhs ! rhs` means send a message containing the rhs to the lhs
       Pid!{new_score,New_Score},
+      % Send all players the new speed of the ball
+      [Player!{speed,?BALL_SPEED} || Player <- tuple_to_list(New_Players), Player /= nil],
       % Don't reply and set the state as the board with updated positions
       {noreply,New_Board}
   end;
