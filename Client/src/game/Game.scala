@@ -105,12 +105,14 @@ class Game {
   val players = Array.tabulate(4)(n => Player(n+1))
   // Run a bash command to get the number of columns & rows
 
+  private val sysMode = if (windows) "cmd /c mode".!! else ""
   private val cols =
-    if (windows) "powershell -command $Host.UI.RawUI.WindowSize.Width".!!.trim.toInt
+    if (windows) """Columns:[\s]*(?<cols>\d+)""".r.findAllIn(sysMode).group(1).toInt
     else ("bash -c 'tput cols'".!!.trim toInt)
   private val rows =
-    if (windows) "powershell -command $Host.UI.RawUI.WindowSize.Height".!!.trim.toInt
+    if (windows) """Lines:[\s]*(?<rows>\d+)""".r.findAllIn(sysMode).group(1).toInt
     else ("bash -c 'tput lines'".!!.trim toInt)
+
   // Create the buffer by filling a space equivalent to the screen size with spaces
   private val buffer = Array.fill(rows, cols)(' ')
   // Change the string representation of the game to a command to clear the screen
