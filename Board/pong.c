@@ -88,7 +88,6 @@ int main(){
   acc_dev = alt_up_accelerometer_spi_open_dev("/dev/accelerometer_spi");
 
   x_val = 0;
-  //while (getc(fp) != '\x1b') {}
   while(1) {
 	  update_xval();
       char read = -1;
