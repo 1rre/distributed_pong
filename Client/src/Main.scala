@@ -19,13 +19,6 @@ object Main extends App {
   val nios = new Nios2Interface
   val node = new Node
 
-  // Align the input so that we're reading the data & not the newlines
-  // This should be do-able as a while loop but when I tried it didn't work
-  def alignInput: Unit =
-    if (!nios.isAlive) sys error "Nios2 didn't start"
-    else if (!nios.ready || nios.read != 10) alignInput
-
-  alignInput
   // While we are still connected to both the board & the server 
   while (node.isAlive && nios.isAlive) {
     if (node.hasMsg) {
@@ -61,7 +54,7 @@ object Main extends App {
       print(game)
     } else if (nios ready) {
       // Read 1 byte & ignore another
-      val newPos = nios.read; nios.skip
+      val newPos = nios.read
       // Send a message saying 'change_pos', our process id and the new position to 'pong_server'
       node.send(a"change_pos", node pid, newPos)
     }

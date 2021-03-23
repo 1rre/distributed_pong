@@ -105,7 +105,7 @@ class Game {
   val players = Array.tabulate(4)(n => Player(n+1))
   // Run a bash command to get the number of columns & rows
 
-  private val r = """.*BufferSize.*[\s]+:\s(?<rows>[0-9]+),(?<cols>[0-9]+)""".r
+  private val r = """.*WindowSize.*[\s]+:\s(?<rows>[0-9]+),(?<cols>[0-9]+)""".r
   private val result = if (windows) "powershell -command \"&{$H=get-host;$H.ui.rawui;}\"".!! else ""
   private val cols = if (windows) r.findAllIn(result).group(1).toInt else ("bash -c 'tput cols'".!!.trim toInt)
   private val rows = if (windows) r.findAllIn(result).group(2).toInt else ("bash -c 'tput lines'".!!.trim toInt)

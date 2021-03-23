@@ -24,15 +24,24 @@ class Nios2Interface {
   // Run the command using the process IO we set up earlier
   private val nios2 = s"$nios2cmd -q --persistent --no-quit-on-ctrl-d" run nios2Io
 
+  // Will there be carriage returns in the input
+  private val byteNum = if (windows) 3 else 2
+
   // Exported functions
   def isAlive = nios2.isAlive
-  def ready = readData.available > 0
+  def ready = readData.available >= byteNum
   def write(data: Array[Byte]) = {
     writeData write data
     writeData.flush
   }
-  def read = readData.read
-  def skip: Unit = readData.read
+  def read: Int = {
+    val data = readData readNBytes byteNum map (0xff & _)
+    data filterNot (Seq(10,13) contains _) headOption match {
+    case Some(x) => x
+    case _ if data.count(_ == 10) >= 2 => 10
+    case _ => 13
+  }
+  }
   def exit = {writeData.close; readData.close; nios2.destroy}
 
   Runtime.getRuntime.addShutdownHook(new Thread {override def run = exit})
