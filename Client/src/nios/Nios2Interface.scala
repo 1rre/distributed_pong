@@ -20,7 +20,7 @@ class Nios2Interface {
     (out: InputStream) => readData = out,
     (err: InputStream) => err close
   )
-  private val nios2cmd = if (windows) "nios2-terminal.exe" else "nios2-terminal"
+  private val nios2cmd = if (windows) "cmd.exe /c nios2-terminal.exe" else "nios2-terminal"
   // Run the command using the process IO we set up earlier
   private val nios2 = s"$nios2cmd -q --persistent --no-quit-on-ctrl-d" run nios2Io
 
