@@ -42,8 +42,8 @@ class Game {
       // Change the previous position of the paddle to spaces (ie clear it) in the buffer
       // This probably needs changing as it leads to graphical glitches
       chars foreach {
-        case n if num <= 2 && (1 until rows-1 contains n) => buffer(n)((x*cols)/255) = ' '
-        case n if num >= 3 && (1 until cols-1 contains n) => buffer((y*rows)/255)(n) = ' '
+        case n if num <= 2 && (1 until rows-1 contains n) => buffer(n)((x*(cols-1))/255) = ' '
+        case n if num >= 3 && (1 until cols-1 contains n) => buffer((y*(rows-1))/255)(n) = ' '
         case _ =>
       }
       // Update the x position depending on the player number
