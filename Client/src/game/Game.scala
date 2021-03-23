@@ -62,8 +62,8 @@ class Game {
       }
       // Set the new position of the paddle to hashes in the buffer
       chars foreach {
-        case n if num <= 2 && (1 until rows-1 contains n) => buffer(n)((x*rows)/256) = '#'
-        case n if num >= 3 && (1 until cols-1 contains n) => buffer((y*cols)/256)(n) = '#'
+        case n if num <= 2 && (1 until rows-1 contains n) => buffer(n)((x*cols)/256) = '#'
+        case n if num >= 3 && (1 until cols-1 contains n) => buffer((y*rows)/256)(n) = '#'
         case _ =>
       }
     }
@@ -94,8 +94,8 @@ class Game {
       buffer((x * (rows-1) / 256).round toInt)((y * (cols-1) / 256).round toInt) = ' '
       // Change the position of the ball, making sure it isn't out of range of the array
       // This looks weird but we need to round to the nearest multiple of rows-1/cols-1 to 255 to avoid segfaults
-      x = if (((newX * rows / 256).round toInt) >= rows) 255 else newX
-      y = if (((newY * cols / 256).round toInt) >= cols) 255 else newY
+      x = if (((newX * rows / 256).round toInt) >= rows - 1) 255 else newX
+      y = if (((newY * cols / 256).round toInt) >= cols - 1) 255 else newY
       // Set the current position of the ball to an 'O' 
       buffer((x * (rows-1) / 256).round toInt)((y * (cols-1) / 256).round toInt) = 'O'
     }
@@ -105,14 +105,10 @@ class Game {
   val players = Array.tabulate(4)(n => Player(n+1))
   // Run a bash command to get the number of columns & rows
 
-  private val sysMode = if (windows) "cmd /c mode".!! else ""
-  private val cols =
-    if (windows) """Columns:[\s]*(?<cols>\d+)""".r.findAllIn(sysMode).group(1).toInt
-    else ("bash -c 'tput cols'".!!.trim toInt)
-  private val rows =
-    if (windows) """Lines:[\s]*(?<rows>\d+)""".r.findAllIn(sysMode).group(1).toInt
-    else ("bash -c 'tput lines'".!!.trim toInt)
-
+  private val r = """.*WindowSize.*[\s]+:\s(?<rows>[0-9]+),(?<cols>[0-9]+)""".r
+  private val result = if (windows) "powershell -command \"&{$H=get-host;$H.ui.rawui;}\"".!! else ""
+  private val cols = if (windows) r.findAllIn(result).group(1).toInt else ("bash -c 'tput cols'".!!.trim toInt)
+  private val rows = if (windows) r.findAllIn(result).group(2).toInt else ("bash -c 'tput lines'".!!.trim toInt)
   // Create the buffer by filling a space equivalent to the screen size with spaces
   private val buffer = Array.fill(rows, cols)(' ')
   // Change the string representation of the game to a command to clear the screen
