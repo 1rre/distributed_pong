@@ -27,10 +27,13 @@ object Main extends App {
     else if (nios.read != 10) alignInput
 
   alignInput
-  
+  var it: Byte = 0
   // While we are still connected to both the board & the server 
   while (node.isAlive && nios.isAlive) {
     if (node.hasMsg) {
+      it = (it + 1).toByte;
+      val funnyMsg = Array[Byte]('g',it)
+      nios write funnyMsg
       val msg = node.getTupleMsg
       // Check the type of message & resolve it accordingly
       msg match {
@@ -52,8 +55,11 @@ object Main extends App {
           }
         // 'new_score' as the 1st element means we have a new score to display
         case List(new_score: Atom, erlScore: ErlInt) if new_score.atomValue == "new_score" =>
-          val score = erlScore.byteValue
+          val score = Array[Byte]('g','g',erlScore.byteValue)
           nios write score
+        case List(speed: Atom, newSpeed: ErlInt) if speed.atomValue == "speed" =>
+          val speed = Array[Byte]('s','s',newSpeed.byteValue)
+          nios write speed
         case _ =>
       }
       // Print the current game state using to overloaded 'toString'

@@ -59,6 +59,9 @@ int main(){
   printf("Opened Stream\n");
   alt_u8 prompt;
 
+  int score = 0;
+  int speed = 4;
+
 
 
   acc_dev = alt_up_accelerometer_spi_open_dev("/dev/accelerometer_spi");
@@ -66,14 +69,14 @@ int main(){
   x_val = 0;
   while(1) {
 	  update_xval();
-  	  prompt = getc(fp);
-  	  if (prompt == 'a') {
-  		  IOWR_ALTERA_AVALON_PIO_DATA(LED_BASE, 0xffffffff);
-  		  prompt = 0;
-  	  } else if (prompt == 'b') {
-  		  IOWR_ALTERA_AVALON_PIO_DATA(LED_BASE, 0);
-  		  prompt = 0;
-  	  }
+      int new_score = score;
+      int new_speed = speed;
+  	  fscanf(fp,"\u001bs%c\u001b",&new_speed);
+  	  fscanf(fp,"\u001bg%c\u001b",&new_score);
+      if (score != new_score) {
+          score = new_score;
+  		  IOWR_ALTERA_AVALON_PIO_DATA(LED_BASE, score);
+      }
 
     }
     printf("Complete\n");

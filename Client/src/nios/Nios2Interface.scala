@@ -23,7 +23,10 @@ class Nios2Interface {
   // Exported functions
   def isAlive = nios2.isAlive
   def ready = readData.available > 0
-  def write(data: Int) = writeData write data
+  def write(data: Array[Byte]) = {
+    writeData write data
+    writeData.flush
+  }
   def read = readData.read
   def skip: Unit = readData.read
   def exit = {writeData.close; readData.close; nios2.destroy}
