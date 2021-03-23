@@ -4,6 +4,7 @@ import sys.process._
 import language.postfixOps
 import collection.mutable.ListBuffer
 import com.ericsson.otp.erlang._
+import nios.Nios2Interface.windows
 
 class Game {
   // Re-enable the cursor when the game exits
@@ -103,8 +104,11 @@ class Game {
   // Make an array of size 4 for the players
   val players = Array.tabulate(4)(n => Player(n+1))
   // Run a bash command to get the number of columns & rows
-  private val cols = "bash -c 'tput cols'".!!.trim toInt
-  private val rows = "bash -c 'tput lines'".!!.trim toInt
+
+  private val r = """BufferSize[\s]+:\s(?<rows>\d+),(?<cols>\d+)""".r
+  private val result = if (windows) "powershell -command \"&{$H=get-host;$H.ui.rawui;}\"".!! else ""
+  private val cols = if (windows) r.findAllIn(result).group("cols").toInt else ("bash -c 'tput cols'".!!.trim toInt)
+  private val rows = if (windows) r.findAllIn(result).group("rows").toInt else ("bash -c 'tput rows'".!!.trim toInt)
   // Create the buffer by filling a space equivalent to the screen size with spaces
   private val buffer = Array.fill(rows, cols)(' ')
   // Change the string representation of the game to a command to clear the screen
