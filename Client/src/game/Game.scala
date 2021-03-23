@@ -78,6 +78,12 @@ class Game {
           case 4 => buffer(rows-1) mapInPlace (_ => '#')
         }
         case f: OtpErlangLong => {
+          num match {
+            case 1 => buffer foreach (_(0) = ' ')
+            case 2 => buffer foreach (_(cols-1) = ' ')
+            case 3 => buffer(0) mapInPlace (_ => ' ')
+            case 4 => buffer(rows-1) mapInPlace (_ => ' ')
+          }
           this(f intValue)
         }
       }
