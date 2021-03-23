@@ -90,13 +90,13 @@ class Game {
     // Override () operator to change the position of the ball when called with 2 doubles
     def apply(newX: Double, newY: Double) = {
       // Change the previous position of the ball to spaces (ie clear it) in the buffer
-      buffer((x * rows / 256).round toInt)((y * cols / 256).round toInt) = ' '
+      buffer((x * (rows-1) / 256).round toInt)((y * (cols-1) / 256).round toInt) = ' '
       // Change the position of the ball, making sure it isn't out of range of the array
       // This looks weird but we need to round to the nearest multiple of rows-1/cols-1 to 255 to avoid segfaults
-      x = if (((newX * rows / 256).round toInt) >= rows) (255 / (rows-1)) * (rows-1) else newX
-      y = if (((newY * cols / 256).round toInt) >= cols) (255 / (cols-1)) * (cols-1) else newY
+      x = if (((newX * rows / 256).round toInt) >= rows) 255 else newX
+      y = if (((newY * cols / 256).round toInt) >= cols) 255 else newY
       // Set the current position of the ball to an 'O'
-      buffer((x * rows / 256).round toInt)((y * cols / 256).round toInt) = 'O'
+      buffer((x * (rows-1) / 256).round toInt)((y * (cols-1) / 256).round toInt) = 'O'
     }
   }
 
