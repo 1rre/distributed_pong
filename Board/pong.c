@@ -16,7 +16,7 @@ alt_u16 x_val = 127<<8;
 alt_up_accelerometer_spi_dev *  acc_dev;
 alt_u8 send_counter = 0;
 alt_u8 uintto7seg[10] = {0b00000010,0b11110011,0b00100101,0b00001101,0b10011001,0b01001001,0b01000010,0b00011111,0b000000001,0b00001001};
-
+int speed = 4;
 
 
 
@@ -25,10 +25,32 @@ IOWR_ALTERA_AVALON_PIO_DATA(HEX0_BASE, uintto7seg[number]);
 IOWR(HEX1_BASE,0, uintto7seg[number]);
 }
 
+void write_to_hex(alt_u8 number, alt_u8 hex_num) {
+	alt_u32 dest,writedata;
+	switch (hex_num) {
+	case 0: dest = HEX0_BASE; break;
+	case 1: dest = HEX1_BASE; break;
+	case 2: dest = HEX2_BASE; break;
+	case 3: dest = HEX3_BASE; break;
+	case 4: dest = HEX4_BASE; break;
+	case 5: dest = HEX5_BASE; break;
+	default: return;
+	}
+	switch (number % 10) {
+	case 0: writedata = 0b11000000; break;
+	case 1: writedata = 0b11111001; break;
+	case 2: writedata = 0b10100100; break;
+	case 3: writedata = 0b10110000; break;
+	case 4: writedata = 0b10011001; break;
+	case 5: writedata = 0b10010010; break;
+	case 6: writedata = 0b10000010; break;
+	case 7: writedata = 0b11111000; break;
+	case 8: writedata = 0b10000000; break;
+	case 9: writedata = 0b10010000; break;
 
-
-void led_write(alt_u8 led_pattern) {
-    IOWR(LED_BASE, 0, led_pattern);
+	}
+	IOWR_ALTERA_AVALON_PIO_DATA(dest, writedata);
+	write_to_hex(number/10,hex_num+1);
 }
 
 alt_16 no_overflow(alt_u16 last, alt_32 change) {
@@ -39,8 +61,8 @@ alt_16 no_overflow(alt_u16 last, alt_32 change) {
 
 void update_xval(){
     alt_up_accelerometer_spi_read_x_axis(acc_dev, & x_read);
-    x_val = no_overflow(x_val,4*x_read);
-    led_write(x_val>>8);
+    x_val = no_overflow(x_val,speed*x_read);
+    //led_write(x_val>>8);
     //printf("xvalue = %d, x_read %d\n",x_val,x_read);
     fprintf(fp,"%c\n",x_val>>8);
     usleep(SLEEP_TIME);
@@ -60,23 +82,27 @@ int main(){
   alt_u8 prompt;
 
   int score = 0;
-  int speed = 4;
 
 
 
   acc_dev = alt_up_accelerometer_spi_open_dev("/dev/accelerometer_spi");
 
   x_val = 0;
+  //while (getc(fp) != '\x1b') {}
   while(1) {
 	  update_xval();
-      int new_score = score;
-      int new_speed = speed;
-  	  fscanf(fp,"\u001bs%c\u001b",&new_speed);
-  	  fscanf(fp,"\u001bg%c\u001b",&new_score);
-      if (score != new_score) {
-          score = new_score;
-  		  IOWR_ALTERA_AVALON_PIO_DATA(LED_BASE, score);
-      }
+      char read = -1;
+  	  read = getc(fp);
+  	  if (read == '\x1b') {
+  		  switch (getc(fp)) {
+  		    case 's':
+  		      speed = getc(fp);
+  		    break;
+  		    case 'g':
+  		      score = getc(fp);
+  		  }
+  	  }
+	  write_to_hex(speed,0);
 
     }
     printf("Complete\n");
