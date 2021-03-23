@@ -62,8 +62,8 @@ class Game {
       }
       // Set the new position of the paddle to hashes in the buffer
       chars foreach {
-        case n if num <= 2 && (1 until rows-1 contains n) => buffer(n)((x*cols)/256) = '#'
-        case n if num >= 3 && (1 until cols-1 contains n) => buffer((y*rows)/256)(n) = '#'
+        case n if num <= 2 && (1 until rows-1 contains n) => buffer(n)((x*rows)/256) = '#'
+        case n if num >= 3 && (1 until cols-1 contains n) => buffer((y*cols)/256)(n) = '#'
         case _ =>
       }
     }
@@ -96,7 +96,7 @@ class Game {
       // This looks weird but we need to round to the nearest multiple of rows-1/cols-1 to 255 to avoid segfaults
       x = if (((newX * rows / 256).round toInt) >= rows) 255 else newX
       y = if (((newY * cols / 256).round toInt) >= cols) 255 else newY
-      // Set the current position of the ball to an 'O'
+      // Set the current position of the ball to an 'O' 
       buffer((x * (rows-1) / 256).round toInt)((y * (cols-1) / 256).round toInt) = 'O'
     }
   }
