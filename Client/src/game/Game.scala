@@ -108,7 +108,7 @@ class Game {
   private val r = """.*BufferSize.*[\s]+:\s(?<rows>[0-9]+),(?<cols>[0-9]+)""".r
   private val result = if (windows) "powershell -command \"&{$H=get-host;$H.ui.rawui;}\"".!! else ""
   private val cols = if (windows) r.findAllIn(result).group(1).toInt else ("bash -c 'tput cols'".!!.trim toInt)
-  private val rows = if (windows) r.findAllIn(result).group(2).toInt else ("bash -c 'tput rows'".!!.trim toInt)
+  private val rows = if (windows) r.findAllIn(result).group(2).toInt else ("bash -c 'tput lines'".!!.trim toInt)
   // Create the buffer by filling a space equivalent to the screen size with spaces
   private val buffer = Array.fill(rows, cols)(' ')
   // Change the string representation of the game to a command to clear the screen

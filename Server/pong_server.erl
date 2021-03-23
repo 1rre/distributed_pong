@@ -53,8 +53,10 @@ loop(Nodes,Ref) -> receive
     % Synchronously send each player the board from their point of view
     % (to avoid it being affected by the tick which happens next & could result in different players getting different game states)
     [Pid!gen_server:call(pong_game,{get_board,Pid}) || Pid <- maps:values(Nodes), pid /= nil],
-    % Advance the game by 1 tick
     gen_server:cast(pong_game,tick),
+    Speed = gen_server:call(pong_game,get_speed),
+    [Pid!{speed,Speed} || Pid <- maps:values(Nodes), pid /= nil],
+    % Advance the game by 1 tick
     % Loop to receive more messages
     loop(Nodes,Ref);
   % If a player wants to change position

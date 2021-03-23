@@ -355,7 +355,7 @@ normalise(#vector{x=X,y=Y}, Speed) ->
   #vector{x=X/N,y=Y/N}.
 
 
--type call() :: {get_board, pid()} | term().
+-type call() :: {get_board, pid()} | get_speed | term().
 -type call_reply() :: {error,term()} | {ok,term()}.
 -spec handle_call(call(),term(),#board{}) -> {reply,call_reply(),#board{}}.
 
@@ -363,6 +363,9 @@ normalise(#vector{x=X,y=Y}, Speed) ->
 % from the pov of the player whom requested it
 handle_call({get_board,Pid},_From,Board) ->
   {reply,get_board(Pid,Board),Board};
+
+handle_call(get_speed, _From, Board=#board{ball=#ball{speed=Speed}}) ->
+  {reply,Speed,Board};
 
 % Respond to any other (unsolicited!) message with an error
 handle_call(Msg,_From,Board) ->

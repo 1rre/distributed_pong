@@ -53,10 +53,11 @@ object Main extends App {
         case List(new_score: Atom, erlScore: ErlInt) if new_score.atomValue == "new_score" =>
           val score = Array[Byte]('\u001b','g',erlScore.byteValue)
           nios write score
-        case List(speed: Atom, newSpeed: ErlInt) if speed.atomValue == "speed" =>
-          val speed = Array[Byte]('\u001b','s',newSpeed.byteValue)
+        case List(speed: Atom, newSpeed: ErlFloat) if speed.atomValue == "speed" =>
+          val speed = Array[Byte]('\u001b','s',newSpeed.doubleValue.toByte)
+          println(speed.toList)
           nios write speed
-        case _ =>
+        case other => println(other)
       }
       // Print the current game state using to overloaded 'toString'
       print(game)
