@@ -28,11 +28,11 @@ class Nios2Interface {
   private val byteNum = if (windows) 3 else 2
 
   // Exported functions
-  def isAlive = nios2.isAlive
+  def isAlive = nios2 isAlive
   def ready = readData.available >= byteNum
   def write(data: Array[Byte]) = {
     writeData write data
-    writeData.flush
+    writeData flush
   }
   def read: Int = {
     val data = readData readNBytes byteNum map (0xff & _)
@@ -44,5 +44,5 @@ class Nios2Interface {
   }
   def exit = {writeData.close; readData.close; nios2.destroy}
 
-  Runtime.getRuntime.addShutdownHook(new Thread {override def run = exit})
+  Runtime.getRuntime addShutdownHook new Thread {override def run = exit}
 }

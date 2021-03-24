@@ -19,12 +19,6 @@ alt_u8 uintto7seg[10] = {0b00000010,0b11110011,0b00100101,0b00001101,0b10011001,
 int speed = 4;
 
 
-
-void update_hex0(alt_8 number){
-IOWR_ALTERA_AVALON_PIO_DATA(HEX0_BASE, uintto7seg[number]);
-IOWR(HEX1_BASE,0, uintto7seg[number]);
-}
-
 void write_to_hex(alt_u8 number, alt_u8 hex_num) {
 	alt_u32 dest,writedata;
 	switch (hex_num) {
