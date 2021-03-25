@@ -5,13 +5,13 @@ import language.postfixOps
 import sys.process._
 
 object Nios2Interface {
+  // If os.name is Linux, we're on Linux. Assume Windows otherwise
+  // This seems to work for all Linux distros I've checked, while MacOS and Windows have inconsistant names depending on version.
   val windows = sys.props.get("os.name") != Some("Linux")
 }
 
 class Nios2Interface {
   import Nios2Interface._
-  // If os.name is Linux, we're on Linux. Assume Windows otherwise
-  // This seems to work for all Linux distros I've checked, while MacOS and Windows have inconsistant names depending on version.
   private var writeData = null.asInstanceOf[OutputStream]
   private var readData = null.asInstanceOf[InputStream]
   // Set up input, output and error streams for nios2 terminal
