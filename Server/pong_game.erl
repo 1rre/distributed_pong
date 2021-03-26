@@ -141,16 +141,12 @@ change_pos(Pid,New_Pos,Players) when (New_Pos > 255) or (New_Pos < 0) ->
   Players;
 % Set the player's next position to move to
 change_pos(Pid,New_Pos,{A=#player{pid=Pid},B,C,D}) ->
-  io:fwrite("Changing A to ~B~n",[New_Pos]),
   {A#player{next_pos=New_Pos},B,C,D};
 change_pos(Pid,New_Pos,{A,B=#player{pid=Pid},C,D}) ->
-  io:fwrite("Changing B to ~B~n",[New_Pos]),
   {A,B#player{next_pos=New_Pos},C,D};
 change_pos(Pid,New_Pos,{A,B,C=#player{pid=Pid},D}) ->
-  io:fwrite("Changing C to ~B~n",[New_Pos]),
   {A,B,C#player{next_pos=New_Pos},D};
 change_pos(Pid,New_Pos,{A,B,C,D=#player{pid=Pid}}) ->
-  io:fwrite("Changing D to ~B~n",[New_Pos]),
   {A,B,C,D#player{next_pos=New_Pos}};
 change_pos(_,_,Board) -> Board.
 
