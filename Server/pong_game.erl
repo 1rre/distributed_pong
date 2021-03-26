@@ -218,27 +218,31 @@ move_ball(Board=#board{players={A,B,C,D},ball=In_Ball}) ->
   end,
   % Update the scores following the bounce function (in case there was a goal)
   case Bounce of
-    {Nb,nil} ->
+    {Nb,P,P} ->
       {New_Ball, New_Players} = {Nb,{A,B,C,D}},
       New_Board = Board#board{ball=New_Ball,players=New_Players},
       {ok,New_Board};
-    {Nb,P} when P#player.pid =:= A#player.pid ->
+    {Nb,nil,_} ->
+      {New_Ball, New_Players} = {Nb,{A,B,C,D}},
+      New_Board = Board#board{ball=New_Ball,players=New_Players},
+      {ok,New_Board};
+    {Nb,P,_Args} when P#player.pid =:= A#player.pid ->
       {New_Ball, New_Players} = {Nb,{A#player{score=A#player.score+1},B,C,D}},
       New_Board = Board#board{ball=New_Ball,players=New_Players},
       {ok,{goal,A#player.pid,A#player.score+1},New_Board};
-    {Nb,P} when P#player.pid =:= B#player.pid ->
+    {Nb,P,_} when P#player.pid =:= B#player.pid ->
       {New_Ball, New_Players} = {Nb,{A,B#player{score=B#player.score+1},C,D}},
       New_Board = Board#board{ball=New_Ball,players=New_Players},
       {ok,{goal,B#player.pid,B#player.score+1},New_Board};
-    {Nb,P} when P#player.pid =:= C#player.pid ->
+    {Nb,P,_} when P#player.pid =:= C#player.pid ->
       {New_Ball, New_Players} = {Nb,{A,B,C#player{score=C#player.score+1},D}},
       New_Board = Board#board{ball=New_Ball,players=New_Players},
       {ok,{goal,C#player.pid,C#player.score+1},New_Board};
-    {Nb,P} when P#player.pid =:= D#player.pid ->
+    {Nb,P,_} when P#player.pid =:= D#player.pid ->
       {New_Ball, New_Players} = {Nb,{A,B,C,D#player{score=D#player.score+1}}},
       New_Board = Board#board{ball=New_Ball,players=New_Players},
       {ok,{goal,D#player.pid,D#player.score+1},New_Board};
-    {Nb,_} ->
+    {Nb,_,_} ->
       {New_Ball, New_Players} = {Nb,{A,B,C,D}},
       New_Board = Board#board{ball=New_Ball,players=New_Players},
       {ok,New_Board};
@@ -267,7 +271,7 @@ bounce(left,Ball,{X1,Y1},{X2,Y2},Player) ->
     % No collision means a goal, so we return a new ball & the last player to touch the ball
     {_,false} ->
       io:fwrite("Last: ~p~n",[Ball#ball.last_touch]),
-      {new_ball(),Ball#ball.last_touch};
+      {new_ball(),Ball#ball.last_touch,Player};
     % This is for error checking, if somehow the player is invalid bounce the ball off the wall
     {0, _} -> bounce_wall(x,Ball);
     % Call the bounce paddle function if there is a collision `Diff` units from the centre of the paddle
@@ -278,7 +282,7 @@ bounce(left,Ball,{X1,Y1},{X2,Y2},Player) ->
 bounce(right,Ball,{X1,Y1},{X2,Y2},Player) ->
   io:fwrite("right~n"),
   case detect_collision(X1,Y1,X2,Y2,255,Player) of
-    {_,false} -> {new_ball(),Ball#ball.last_touch};
+    {_,false} -> {new_ball(),Ball#ball.last_touch,Player};
     {0, _} -> bounce_wall(x,Ball);
     {Diff, _} -> (bounce_paddle(x,Diff,Ball))#ball{last_touch = Player}
   end;
@@ -286,7 +290,7 @@ bounce(right,Ball,{X1,Y1},{X2,Y2},Player) ->
 bounce(top,Ball,{X1,Y1},{X2,Y2},Player) ->
   io:fwrite("top~n"),
   case detect_collision(Y1,X1,Y2,X2,255,Player) of
-    {_,false} -> {new_ball(),Ball#ball.last_touch};
+    {_,false} -> {new_ball(),Ball#ball.last_touch,Player};
     {0, _} ->
       io:fwrite("Wall~n"),
       bounce_wall(y,Ball);
@@ -296,7 +300,7 @@ bounce(top,Ball,{X1,Y1},{X2,Y2},Player) ->
 bounce(bottom,Ball,{X1,Y1},{X2,Y2},Player) ->
   io:fwrite("bottom~n"),
   case detect_collision(Y1,X1,Y2,X2,0,Player) of
-    {_,false} -> {new_ball(),Ball#ball.last_touch};
+    {_,false} -> {new_ball(),Ball#ball.last_touch,Player};
     {0, _} -> bounce_wall(y,Ball);
     {Diff, _} -> (bounce_paddle(x,Diff,Ball))#ball{last_touch = Player}
   end;
