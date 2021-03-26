@@ -265,7 +265,7 @@ bounce(left,Ball,{X1,Y1},{X2,Y2},Player) ->
     % This is for error checking, if somehow the player is invalid bounce the ball off the wall
     {0, _} -> bounce_wall(x,Ball);
     % Call the bounce paddle function if there is a collision `Diff` units from the centre of the paddle
-    {Diff, _} -> {bounce_paddle(x,Diff,Ball),Player}
+    {Diff, _} -> (bounce_paddle(x,Diff,Ball))#ball{last_touch = Player}
   end;
 
 % These are all the same just rotated etc. for different walls
@@ -274,7 +274,7 @@ bounce(right,Ball,{X1,Y1},{X2,Y2},Player) ->
   case detect_collision(X1,Y1,X2,Y2,255,Player) of
     {_,false} -> {new_ball(),Ball#ball.last_touch};
     {0, _} -> bounce_wall(x,Ball);
-    {Diff, _} -> {bounce_paddle(x,Diff,Ball),Player}
+    {Diff, _} -> (bounce_paddle(x,Diff,Ball))#ball{last_touch = Player}
   end;
 
 bounce(top,Ball,{X1,Y1},{X2,Y2},Player) ->
@@ -284,9 +284,7 @@ bounce(top,Ball,{X1,Y1},{X2,Y2},Player) ->
     {0, _} ->
       io:fwrite("Wall~n"),
       bounce_wall(y,Ball);
-    {Diff, _} ->
-      io:fwrite("Paddle: ~p~n",[Diff]),
-      {bounce_paddle(y,Diff,Ball),Player}
+    {Diff, _} -> (bounce_paddle(x,Diff,Ball))#ball{last_touch = Player}
   end;
 
 bounce(bottom,Ball,{X1,Y1},{X2,Y2},Player) ->
@@ -294,7 +292,7 @@ bounce(bottom,Ball,{X1,Y1},{X2,Y2},Player) ->
   case detect_collision(Y1,X1,Y2,X2,0,Player) of
     {_,false} -> {new_ball(),Ball#ball.last_touch};
     {0, _} -> bounce_wall(y,Ball);
-    {Diff, _} -> {bounce_paddle(y,Diff,Ball),Player}
+    {Diff, _} -> (bounce_paddle(x,Diff,Ball))#ball{last_touch = Player}
   end;
 
 % For a corner bounce, just return the ball in the opposite direction it came from because corner bounces are scary
