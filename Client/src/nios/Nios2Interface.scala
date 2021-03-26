@@ -9,7 +9,6 @@ object Nios2Interface {
   // This seems to work for all Linux distros I've checked, while MacOS and Windows have inconsistant names depending on version.
   val windows = (sys.props get "os.name") != Some("Linux")
   val wsl = (("uname -r"!!) contains "Microsoft")
-  println(wsl)
 }
 
 class Nios2Interface {
