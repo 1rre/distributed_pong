@@ -261,7 +261,9 @@ bounce(left,Ball,{X1,Y1},{X2,Y2},Player) ->
   io:fwrite("left~n"),
   case detect_collision(X1,Y1,X2,Y2,0,Player) of
     % No collision means a goal, so we return a new ball & the last player to touch the ball
-    {_,false} -> {new_ball(),Ball#ball.last_touch};
+    {_,false} ->
+      io:fwrite("Last: ~p~n",[Ball#ball.last_touch]),
+      {new_ball(),Ball#ball.last_touch};
     % This is for error checking, if somehow the player is invalid bounce the ball off the wall
     {0, _} -> bounce_wall(x,Ball);
     % Call the bounce paddle function if there is a collision `Diff` units from the centre of the paddle
