@@ -8,7 +8,8 @@ object Nios2Interface {
   // If os.name is Linux, we're on Linux. Assume Windows otherwise
   // This seems to work for all Linux distros I've checked, while MacOS and Windows have inconsistant names depending on version.
   val windows = (sys.props get "os.name") != Some("Linux")
-  val wsl = !(("uname -r"!!) contains "Microsoft")
+  val wsl = (("uname -r"!!) contains "Microsoft")
+  println(wsl)
 }
 
 class Nios2Interface {
@@ -29,7 +30,7 @@ class Nios2Interface {
   private val nios2 = s"$nios2cmd -q --persistent --no-quit-on-ctrl-d" run nios2Io
 
   // Will there be carriage returns in the input
-  private val byteNum = if (windows) 3 else 2
+  private val byteNum = if (windows || wsl) 3 else 2
 
   // Exported functions
   def isAlive = nios2 isAlive
