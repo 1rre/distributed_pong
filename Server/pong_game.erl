@@ -222,19 +222,19 @@ move_ball(Board=#board{players={A,B,C,D},ball=In_Ball}) ->
       {New_Ball, New_Players} = {Nb,{A,B,C,D}},
       New_Board = Board#board{ball=New_Ball,players=New_Players},
       {ok,New_Board};
-    {Nb,A} ->
+    {Nb,P} when P#player.pid =:= A#player.pid ->
       {New_Ball, New_Players} = {Nb,{A#player{score=A#player.score+1},B,C,D}},
       New_Board = Board#board{ball=New_Ball,players=New_Players},
       {ok,{goal,A#player.pid,A#player.score+1},New_Board};
-    {Nb,B} ->
+    {Nb,P} when P#player.pid =:= B#player.pid ->
       {New_Ball, New_Players} = {Nb,{A,B#player{score=B#player.score+1},C,D}},
       New_Board = Board#board{ball=New_Ball,players=New_Players},
       {ok,{goal,B#player.pid,B#player.score+1},New_Board};
-    {Nb,C} ->
+    {Nb,P} when P#player.pid =:= C#player.pid ->
       {New_Ball, New_Players} = {Nb,{A,B,C#player{score=C#player.score+1},D}},
       New_Board = Board#board{ball=New_Ball,players=New_Players},
       {ok,{goal,C#player.pid,C#player.score+1},New_Board};
-    {Nb,D} ->
+    {Nb,P} when P#player.pid =:= D#player.pid ->
       {New_Ball, New_Players} = {Nb,{A,B,C,D#player{score=D#player.score+1}}},
       New_Board = Board#board{ball=New_Ball,players=New_Players},
       {ok,{goal,D#player.pid,D#player.score+1},New_Board};
