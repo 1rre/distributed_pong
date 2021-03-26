@@ -218,6 +218,10 @@ move_ball(Board=#board{players={A,B,C,D},ball=In_Ball}) ->
   end,
   % Update the scores following the bounce function (in case there was a goal)
   case Bounce of
+    {Nb,nil} ->
+      {New_Ball, New_Players} = {Nb,{A,B,C,D}},
+      New_Board = Board#board{ball=New_Ball,players=New_Players},
+      {ok,New_Board};
     {Nb,A} ->
       {New_Ball, New_Players} = {Nb,{A#player{score=A#player.score+1},B,C,D}},
       New_Board = Board#board{ball=New_Ball,players=New_Players},
