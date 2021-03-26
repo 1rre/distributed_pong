@@ -61,7 +61,6 @@ loop(Nodes,Ref) -> receive
     loop(Nodes,Ref);
   % If a player wants to change position
   {change_pos,Pid,Pos} ->
-    io:fwrite("Changing to ~p~n",[Pos]),
     % Asynchronously change their position
     gen_server:cast(pong_game,{change_pos,Pid,Pos}),
     % Loop to receive more messages
