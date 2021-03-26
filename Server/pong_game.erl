@@ -242,9 +242,7 @@ move_ball(Board=#board{players={A,B,C,D},ball=In_Ball}) ->
       {New_Ball, New_Players} = {Nb,{A,B,C,D}},
       New_Board = Board#board{ball=New_Ball,players=New_Players},
       {ok,New_Board}
-  end,
-  % Add the new ball position & players to the board & set it as the current state
-.
+  end.
 
 
 -type wall() :: left | top | right | bottom | top_left | top_right | bottom_right | bottom_left.
