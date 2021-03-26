@@ -40,6 +40,7 @@ class Nios2Interface {
   }
   def read: Int = {
     val data = readData readNBytes byteNum map (0xff & _)
+    println(data.mkString(", "))
     data filterNot (Seq(10,13) contains _) headOption match {
       case Some(x) => x
       case _ if data.count(_ == 10) >= 2 => 10
