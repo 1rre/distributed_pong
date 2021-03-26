@@ -93,7 +93,7 @@ handle_cast(tick,Board) ->
       Pid!{new_score,New_Score},
       % Send all players the new speed of the ball
       io:fwrite("~p~n",[New_Players]),
-      [Player!{speed,?BALL_SPEED} || Player <- tuple_to_list(New_Players), Player /= nil],
+      [Player!{speed,?BALL_SPEED} || #player{pid=Player} <- tuple_to_list(New_Players)],
       % Don't reply and set the state as the board with updated positions
       {noreply,New_Board}
   end;
