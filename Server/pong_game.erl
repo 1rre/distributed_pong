@@ -87,6 +87,7 @@ handle_cast(tick,Board) ->
     {ok,New_Board} -> {noreply,New_Board};
     % If there's a goal
     {ok,{goal,Pid,New_Score},New_Board} ->
+      io:fwrite("~p new score: ~p~n",[Pid,New_Score]),
       % Send the player who scored their new score
       % `lhs ! rhs` means send a message containing the rhs to the lhs
       Pid!{new_score,New_Score},
@@ -216,17 +217,34 @@ move_ball(Board=#board{players={A,B,C,D},ball=In_Ball}) ->
       Ball#ball{pos=New_Pos}
   end,
   % Update the scores following the bounce function (in case there was a goal)
-  {New_Ball, New_Players} = case Bounce of
-    {Nb,a} -> {Nb,{A#player{score=A#player.score+1},B,C,D}};
-    {Nb,b} -> {Nb,{A,B#player{score=B#player.score+1},C,D}};
-    {Nb,c} -> {Nb,{A,B,C#player{score=C#player.score+1},D}};
-    {Nb,d} -> {Nb,{A,B,C,D#player{score=D#player.score+1}}};
-    {Nb,_} -> {Nb,{A,B,C,D}};
-    Nb -> {Nb,{A,B,C,D}}
+  case Bounce of
+    {Nb,A} ->
+      {New_Ball, New_Players} = {Nb,{A#player{score=A#player.score+1},B,C,D}},
+      New_Board = Board#board{ball=New_Ball,players=New_Players},
+      {ok,{goal,A#player.pid,A#player.score+1},New_Board};
+    {Nb,B} ->
+      {New_Ball, New_Players} = {Nb,{A,B#player{score=B#player.score+1},C,D}},
+      New_Board = Board#board{ball=New_Ball,players=New_Players},
+      {ok,{goal,B#player.pid,B#player.score+1},New_Board};
+    {Nb,C} ->
+      {New_Ball, New_Players} = {Nb,{A,B,C#player{score=C#player.score+1},D}},
+      New_Board = Board#board{ball=New_Ball,players=New_Players},
+      {ok,{goal,C#player.pid,C#player.score+1},New_Board};
+    {Nb,D} ->
+      {New_Ball, New_Players} = {Nb,{A,B,C,D#player{score=D#player.score+1}}},
+      New_Board = Board#board{ball=New_Ball,players=New_Players},
+      {ok,{goal,D#player.pid,D#player.score+1},New_Board};
+    {Nb,_} ->
+      {New_Ball, New_Players} = {Nb,{A,B,C,D}},
+      New_Board = Board#board{ball=New_Ball,players=New_Players},
+      {ok,New_Board};
+    Nb ->
+      {New_Ball, New_Players} = {Nb,{A,B,C,D}},
+      New_Board = Board#board{ball=New_Ball,players=New_Players},
+      {ok,New_Board}
   end,
   % Add the new ball position & players to the board & set it as the current state
-  New_Board = Board#board{ball=New_Ball,players=New_Players},
-  {ok,New_Board}.
+.
 
 
 -type wall() :: left | top | right | bottom | top_left | top_right | bottom_right | bottom_left.
@@ -249,7 +267,7 @@ bounce(left,Ball,{X1,Y1},{X2,Y2},Player) ->
     % This is for error checking, if somehow the player is invalid bounce the ball off the wall
     {0, _} -> bounce_wall(x,Ball);
     % Call the bounce paddle function if there is a collision `Diff` units from the centre of the paddle
-    {Diff, _} -> bounce_paddle(x,Diff,Ball)
+    {Diff, _} -> {bounce_paddle(x,Diff,Ball),Player}
   end;
 
 % These are all the same just rotated etc. for different walls
@@ -258,7 +276,7 @@ bounce(right,Ball,{X1,Y1},{X2,Y2},Player) ->
   case detect_collision(X1,Y1,X2,Y2,255,Player) of
     {_,false} -> {new_ball(),Ball#ball.last_touch};
     {0, _} -> bounce_wall(x,Ball);
-    {Diff, _} -> bounce_paddle(x,Diff,Ball)
+    {Diff, _} -> {bounce_paddle(x,Diff,Ball),Player}
   end;
 
 bounce(top,Ball,{X1,Y1},{X2,Y2},Player) ->
@@ -270,7 +288,7 @@ bounce(top,Ball,{X1,Y1},{X2,Y2},Player) ->
       bounce_wall(y,Ball);
     {Diff, _} ->
       io:fwrite("Paddle: ~p~n",[Diff]),
-      bounce_paddle(y,Diff,Ball)
+      {bounce_paddle(y,Diff,Ball),Player}
   end;
 
 bounce(bottom,Ball,{X1,Y1},{X2,Y2},Player) ->
@@ -278,7 +296,7 @@ bounce(bottom,Ball,{X1,Y1},{X2,Y2},Player) ->
   case detect_collision(Y1,X1,Y2,X2,0,Player) of
     {_,false} -> {new_ball(),Ball#ball.last_touch};
     {0, _} -> bounce_wall(y,Ball);
-    {Diff, _} -> bounce_paddle(y,Diff,Ball)
+    {Diff, _} -> {bounce_paddle(y,Diff,Ball),Player}
   end;
 
 % For a corner bounce, just return the ball in the opposite direction it came from because corner bounces are scary
