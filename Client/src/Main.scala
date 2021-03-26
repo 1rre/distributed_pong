@@ -43,11 +43,10 @@ object Main extends App {
           }
         // 'new_score' as the 1st element means we have a new score to display
         case List(new_score: Atom, erlScore: ErlInt) if new_score.atomValue == "new_score" =>
-          println(erlScore.byteValue)
-          val score = Array[Byte]('\u001b','g',erlScore.byteValue)
+          val score = Array[Byte]('\u001b','s',erlScore.byteValue)
           nios write score
         case List(speed: Atom, newSpeed: ErlFloat) if speed.atomValue == "speed" =>
-          val speed = Array[Byte]('\u001b','s',(newSpeed.doubleValue*2).toByte)
+          val speed = Array[Byte]('\u001b','g',(newSpeed.doubleValue*2).toByte)
           nios write speed
         case _ =>
       }

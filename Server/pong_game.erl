@@ -112,10 +112,18 @@ handle_cast(_,Board) -> {noreply,Board}.
 -spec add_player(pid(),players()) -> players().
 
 % Add a player by finding the 1st slot which is free & assigning it to the new player
-add_player(Pid,{nil,B,C,D}) -> {#player{pid=Pid},B,C,D};
-add_player(Pid,{A,nil,C,D}) -> {A,#player{pid=Pid},C,D};
-add_player(Pid,{A,B,nil,D}) -> {A,B,#player{pid=Pid},D};
-add_player(Pid,{A,B,C,nil}) -> {A,B,C,#player{pid=Pid}};
+add_player(Pid,{nil,B,C,D}) ->
+  Pid!{new_score,0},
+  {#player{pid=Pid},B,C,D};
+add_player(Pid,{A,nil,C,D}) ->
+  Pid!{new_score,0},
+  {A,#player{pid=Pid},C,D};
+add_player(Pid,{A,B,nil,D}) ->
+  Pid!{new_score,0},
+  {A,B,#player{pid=Pid},D};
+add_player(Pid,{A,B,C,nil}) ->
+  Pid!{new_score,0},
+  {A,B,C,#player{pid=Pid}};
 % If the game is full, send a message to the player who attempted to join
 add_player(Pid,Board) ->
   Pid!<<"The game is full, sorry">>,
@@ -215,7 +223,7 @@ move_ball(Board=#board{players={A,B,C,D},ball=In_Ball}) ->
   end,
   % Update the scores following the bounce function (in case there was a goal)
   case Bounce of
-    {Nb,P,P} ->
+    {Nb,#player{pid=P},#player{pid=P}} ->
       {New_Ball, New_Players} = {Nb,{A,B,C,D}},
       New_Board = Board#board{ball=New_Ball,players=New_Players},
       {ok,New_Board};
