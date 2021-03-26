@@ -113,10 +113,10 @@ class Game {
 
   private val result = if (windows) "cmd /c mode"!! else ""
   private val cols =
-    if (windows) """Columns:[\s]*(?<cols>\d+)""".r findAllIn result group 1 toInt
+    if (windows) """Lines:[\s]*(?<cols>\d+)""".r findAllIn result group 1 toInt
     else ("bash -c 'tput cols'".!!.trim toInt)
   private val rows =
-    if (windows) """Lines:[\s]*(?<rows>\d+)""".r findAllIn result group 1 toInt
+    if (windows) """Columns:[\s]*(?<rows>\d+)""".r findAllIn result group 1 toInt
     else ("bash -c 'tput lines'".!!.trim toInt)
   // Create the buffer by filling a space equivalent to the screen size with spaces
   private val buffer = Array.fill(rows, cols)(' ')
