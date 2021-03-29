@@ -104,7 +104,7 @@ handle_cast({change_pos,Pid,New_Pos},Board) ->
   New_Players = change_pos(Pid,New_Pos,Board#board.players),
   % Don't reply & set the state to the board with updated player positions
   {noreply,Board#board{players=New_Players}};
-  
+
 % Ignore any other asynchronous request
 handle_cast(_,Board) -> {noreply,Board}.
 
@@ -206,7 +206,7 @@ move_ball(Board=#board{players={A,B,C,D},ball=In_Ball}) ->
     % Bounce on top wall or top goal
     #vector{x=X,y=Y} when Y < 0 ->
       bounce(top,Ball,{Px,Py},{X,Y},C);
-    
+
     % Bounce on bottom left corner or left goal
     #vector{x=X,y=Y} when Y > 255 andalso X < 0 ->
       bounce(bottom_left,Ball,{Px,Py},{X,Y},D);
@@ -216,7 +216,7 @@ move_ball(Board=#board{players={A,B,C,D},ball=In_Ball}) ->
     % Bounce on bottom wall or bottom goal
     #vector{x=X,y=Y} when Y > 255 ->
       bounce(bottom,Ball,{Px,Py},{X,Y},D);
-    
+
     % No bounce
     New_Pos ->
       Ball#ball{pos=New_Pos}
@@ -294,7 +294,7 @@ bounce(right,Ball,{X1,Y1},{X2,Y2},Player) ->
 
 bounce(top,Ball,{X1,Y1},{X2,Y2},Player) ->
   io:fwrite("top~n"),
-  case detect_collision(Y1,X1,Y2,X2,255,Player) of
+  case detect_collision(Y1,X1,Y2,X2,0,Player) of
     {_,false} -> {new_ball(),Ball#ball.last_touch,Player};
     {0, _} ->
       io:fwrite("Wall~n"),
@@ -304,7 +304,7 @@ bounce(top,Ball,{X1,Y1},{X2,Y2},Player) ->
 
 bounce(bottom,Ball,{X1,Y1},{X2,Y2},Player) ->
   io:fwrite("bottom~n"),
-  case detect_collision(Y1,X1,Y2,X2,0,Player) of
+  case detect_collision(Y1,X1,Y2,X2,255,Player) of
     {_,false} -> {new_ball(),Ball#ball.last_touch,Player};
     {0, _} -> bounce_wall(y,Ball);
     {Diff, _} -> (bounce_paddle(x,Diff,Ball))#ball{last_touch = Player}
@@ -327,7 +327,7 @@ detect_collision(_,_,_,_,_,nil) ->
 detect_collision(X1,Y1,X2,Y2,Wall,Player) ->
   io:fwrite("(~p,~p) => (~p,~p)~n",[X1,Y1,X2,Y2]),
   io:fwrite("Player: ~p~n",[Player]),
-  % y = Mx + c :) 
+  % y = Mx + c :)
   Dy = Y2-Y1,
   Dx = X2-X1,
   M = Dy/Dx,
@@ -429,12 +429,12 @@ get_board(Pid,Board=#board{players={A,B=#player{pid=Pid},C,D}, ball=Ball=#ball{p
   get_board(Pid,Flipped_Board);
 
 get_board(Pid,Board=#board{players={A,B,C=#player{pid=Pid},D}, ball=Ball=#ball{pos=Pos}}) ->
-  New_Ball_Pos = Pos#vector{x=Pos#vector.y, y=255-Pos#vector.x},
+  New_Ball_Pos = Pos#vector{x=Pos#vector.y, y=Pos#vector.x},
   Flipped_Board = Board#board{players={C,D,B,A},ball=Ball#ball{pos=New_Ball_Pos}},
   get_board(Pid,Flipped_Board);
 
 get_board(Pid,Board=#board{players={A,B,C,D=#player{pid=Pid}}, ball=Ball=#ball{pos=Pos}}) ->
-  New_Ball_Pos = Pos#vector{x=255-Pos#vector.y, y=255-Pos#vector.x},
+  New_Ball_Pos = Pos#vector{x=255-Pos#vector.y, y=Pos#vector.x},
   Flipped_Board = Board#board{players={D,C,A,B},ball=Ball#ball{pos=New_Ball_Pos}},
   get_board(Pid,Flipped_Board);
 
