@@ -16,7 +16,8 @@ class Node {
   // Create a representation of the remote node so we can connect to it etc.
   private val remote = new OtpPeer(s"pong@$ip")
 
-
+  val connS = System.nanoTime
+  lazy val connF = System.nanoTime
   // Connect to the remote node from the local node
   private val connection = local connect remote
   
@@ -37,6 +38,8 @@ class Node {
   Runtime.getRuntime.addShutdownHook(new Thread {override def run = exit})
   // Send a message to the registered name "pong server" through the connection
   // to register as a player with our process ID and local node
+  val msgS = System.nanoTime
+  lazy val msgF = System.nanoTime
   send(a"register", pid, local node)
 
 }

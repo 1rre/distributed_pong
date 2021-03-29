@@ -19,6 +19,7 @@ object Main extends App {
   val nios = new Nios2Interface
   val node = new Node
 
+  var tick = System.nanoTime
   // While we are still connected to both the board & the server 
   while (node.isAlive && nios.isAlive) {
     if (node.hasMsg) {
@@ -26,7 +27,7 @@ object Main extends App {
       // Check the type of message & resolve it accordingly
       msg match {
         // 'ok' as the 1st element could only be a frame to print 
-        case List(ok: Atom, newState: ErlTuple) if ok.atomValue == "ok" =>
+        case List(ok: Atom, newState: ErlTuple) if ok.atomValue == "ok" => {
           newState toList match {
             case List(ball: ErlTuple, players: ErlTuple) => {
               ball toList match {
@@ -41,12 +42,13 @@ object Main extends App {
             }
             case _ =>
           }
+        }
         // 'new_score' as the 1st element means we have a new score to display
         case List(new_score: Atom, erlScore: ErlInt) if new_score.atomValue == "new_score" =>
-          val score = Array[Byte]('\u001b','s',erlScore.byteValue)
+          val score = Array[Byte]('\u001b','g',erlScore.byteValue)
           nios write score
         case List(speed: Atom, newSpeed: ErlFloat) if speed.atomValue == "speed" =>
-          val speed = Array[Byte]('\u001b','g',(newSpeed.doubleValue*2).toByte)
+          val speed = Array[Byte]('\u001b','s',(newSpeed.doubleValue*2).toByte)
           nios write speed
         case _ =>
       }
