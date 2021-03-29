@@ -20,14 +20,6 @@ alt_u8 uintto7seg[10] = {0b00000010,0b11110011,0b00100101,0b00001101,0b10011001,
 int speed = 4;
 alt_64 acc;
 
-alt_32 filtered(alt_32 x_in[FILTER_SIZE]) {
-    alt_64 acc=0;
-    for (int i=0;i<FILTER_SIZE;i++) {
-        acc += x_in[i];
-    }
-    return (alt_32)(acc/FILTER_SIZE);
-}
-
 void write_to_hex(alt_u8 number, alt_u8 hex_num) {
     alt_u32 dest,writedata;
     switch (hex_num) {
