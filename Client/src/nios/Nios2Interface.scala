@@ -23,7 +23,7 @@ class Nios2Interface {
   )
   private val nios2cmd =
     if (windows) "cmd.exe /c nios2-terminal.exe"
-    else if (wsl) "/mnt/c/intelFPGA_lite/18.0/quartus/bin64/nios2-terminal.exe"
+    else if (wsl) "nios2-terminal.exe"
     else "nios2-terminal"
   // Run the command using the process IO we set up earlier
   private val nios2 = s"$nios2cmd -q --persistent --no-quit-on-ctrl-d" run nios2Io

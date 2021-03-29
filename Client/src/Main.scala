@@ -19,7 +19,6 @@ object Main extends App {
   val nios = new Nios2Interface
   val node = new Node
 
-  var tick = System.nanoTime
   // While we are still connected to both the board & the server 
   while (node.isAlive && nios.isAlive) {
     if (node.hasMsg) {
