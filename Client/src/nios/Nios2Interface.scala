@@ -8,7 +8,7 @@ object Nios2Interface {
   // If os.name is Linux, we're on Linux. Assume Windows otherwise
   // This seems to work for all Linux distros I've checked, while MacOS and Windows have inconsistant names depending on version.
   val windows = (sys.props get "os.name") != Some("Linux")
-  val wsl = (("uname -r"!!) contains "Microsoft")
+  val wsl = util.Try("uname -r".!!.toLowerCase contains "microsoft").getOrElse(false)
 }
 
 class Nios2Interface {
@@ -23,7 +23,7 @@ class Nios2Interface {
   )
   private val nios2cmd =
     if (windows) "cmd.exe /c nios2-terminal.exe"
-    else if (wsl) "nios2-terminal.exe"
+    else if (wsl) "/mnt/c/intelFPGA_lite/18.1/quartus/bin64/nios2-terminal.exe"
     else "nios2-terminal"
   // Run the command using the process IO we set up earlier
   private val nios2 = s"$nios2cmd -q --persistent --no-quit-on-ctrl-d" run nios2Io
