@@ -1,0 +1,9 @@
+extends: default
+toc:
+  font_size: 14
+base:
+  font_size: 9
+  line_height_length: 10
+image:
+  caption:
+    align: inherit
