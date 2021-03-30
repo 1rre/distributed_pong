@@ -1,6 +1,6 @@
 = Developing an IoT System: ELEC50009 Information Processing
 :doctype: book
-:author: T.Moores, H.Solomon, I.Mohamed, A.Rehman
+:author: I.Mohamed, T.Moores, A.Rehman, H.Solomon
 :toc:
 :toclevels: 5
 :stem: asciimath
